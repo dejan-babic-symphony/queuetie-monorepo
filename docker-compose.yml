@@ -1,0 +1,97 @@
+version: '3.4'
+
+services:
+  gateway:
+    container_name: queuetie-gateway
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: development
+      args:
+        APP_NAME: gateway
+    command: /bin/sh -c "npm run remote:gateway"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file:
+      - .env.docker
+    ports:
+      - '3000:3000'
+      - '9000:9229'
+    volumes:
+      - '.:/usr/src/app'
+    networks:
+      - queuetie
+  dispatcher:
+    container_name: queuetie-dispatcher
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: development
+      args:
+        APP_NAME: dispatcher
+    command: /bin/sh -c "npm run remote:dispatcher"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file:
+      - .env.docker
+    ports:
+      - '4000:3000'
+      - '9100:9229'
+    volumes:
+      - '.:/usr/src/app'
+    networks:
+      - queuetie
+  worker:
+    container_name: queuetie-worker
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: development
+      args:
+        APP_NAME: worker
+    command: /bin/sh -c "npm run remote:worker"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file:
+      - .env.docker
+    ports:
+      - '5000:3000'
+      - '9200:9229'
+    volumes:
+      - '.:/usr/src/app'
+    networks:
+      - queuetie
+  monitor:
+    container_name: queuetie-monitor
+    image: venatum/bull-board:latest
+    restart: unless-stopped
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '8000:3000'
+    environment:
+      - REDIS_HOST=redis
+    networks:
+      - queuetie
+  redis:
+    image: 'redis:alpine'
+    container_name: queuetie-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis:/data'
+    networks:
+      - queuetie
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      retries: 3
+      timeout: 5s
+networks:
+  queuetie:
+    driver: bridge
+volumes:
+  redis:
+    driver: local
