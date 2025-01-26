@@ -5,7 +5,7 @@
   "defaultLibraryPrefix": "@queuetie",
   "compilerOptions": {
     "deleteOutDir": true,
-    "webpack": true,
+    "webpack": false,
     "tsConfigPath": "apps/queuetie-monorepo/tsconfig.app.json"
   },
   "monorepo": true,
@@ -56,13 +56,13 @@
         "tsConfigPath": "libs/event/tsconfig.lib.json"
       }
     },
-    "logger": {
+    "pino": {
       "type": "library",
-      "root": "libs/logger",
+      "root": "libs/pino",
       "entryFile": "index",
-      "sourceRoot": "libs/logger/src",
+      "sourceRoot": "libs/pino/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/logger/tsconfig.lib.json"
+        "tsConfigPath": "libs/pino/tsconfig.lib.json"
       }
     },
     "bullmq": {
@@ -90,6 +90,15 @@
       "sourceRoot": "libs/types/src",
       "compilerOptions": {
         "tsConfigPath": "libs/types/tsconfig.lib.json"
+      }
+    },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json"
       }
     }
   }

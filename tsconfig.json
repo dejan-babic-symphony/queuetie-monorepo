@@ -20,14 +20,16 @@
     "paths": {
       "@queuetie/event": ["libs/event/src"],
       "@queuetie/event/*": ["libs/event/src/*"],
-      "@queuetie/logger": ["libs/logger/src"],
-      "@queuetie/logger/*": ["libs/logger/src/*"],
+      "@queuetie/pino": ["libs/pino/src"],
+      "@queuetie/pino/*": ["libs/pino/src/*"],
       "@queuetie/bullmq": ["libs/bullmq/src"],
       "@queuetie/bullmq/*": ["libs/bullmq/src/*"],
       "@queuetie/redis": ["libs/redis/src"],
       "@queuetie/redis/*": ["libs/redis/src/*"],
       "@queuetie/types": ["libs/types/src"],
-      "@queuetie/types/*": ["libs/types/src/*"]
+      "@queuetie/types/*": ["libs/types/src/*"],
+      "@queuetie/config": ["libs/config/src"],
+      "@queuetie/config/*": ["libs/config/src/*"]
     }
   }
 }
