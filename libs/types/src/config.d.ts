@@ -9,3 +9,8 @@ export type GatewayConfig = {
   cors: string;
   channels: GatewayChannels;
 };
+
+export type RedisConfig = {
+  host: string;
+  port: number;
+};
