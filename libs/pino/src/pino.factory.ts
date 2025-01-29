@@ -1,12 +1,12 @@
 import { ConfigService } from '@nestjs/config';
-import { PinoConfig } from '@queuetie/types';
-import { v4 as uuidv4 } from 'uuid';
+import { PinoConfig } from '@queuetie/types/config';
+import { randomUUID } from 'crypto';
 
 export const LoggerFactory = (config: ConfigService<PinoConfig>) => {
   return {
     pinoHttp: {
       level: config.get('level') ?? 'info',
-      genReqId: (request) => request.headers['x-correlation-id'] || uuidv4(),
+      genReqId: (request) => request.headers['x-correlation-id'] || randomUUID,
       autoLogging: false,
       useExistingLogger: true,
       transport:

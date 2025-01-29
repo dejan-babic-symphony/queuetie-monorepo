@@ -2,6 +2,10 @@ type EnvSchema = {
   NODE_ENV: string;
   LOGGER_LEVEL: string;
   LOGGER_PRETTY: boolean;
+  GATEWAY_CORS_ORIGIN: string;
+  GATEWAY_SOCKET_CHANNEL_BROADCAST: string;
+  GATEWAY_SOCKET_CHANNEL_NOTIFICATION: string;
+  GATEWAY_SOCKET_CHANNEL_PROGRESS: string;
 };
 
 declare global {
@@ -11,4 +15,6 @@ declare global {
     interface ProcessEnv extends Record<keyof EnvSchema, string | undefined> {}
   }
 }
-export * from '.';
+
+export * from './pino';
+export * from './gateway';
