@@ -6,7 +6,6 @@ import { pinoConfig } from '@queuetie/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
     ConfigModule.forFeature(pinoConfig),
     PinoLoggerModule.forRootAsync({
       useFactory: LoggerFactory,
