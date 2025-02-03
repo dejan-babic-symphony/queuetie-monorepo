@@ -15,7 +15,7 @@ export type RedisConfig = {
   port: number;
 };
 
-export type WorkerConfig = {
+export type QueueConfig = {
   firstQueue: string;
   secondQueue: string;
 };

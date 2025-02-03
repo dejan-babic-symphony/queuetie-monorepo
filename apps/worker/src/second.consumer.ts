@@ -2,7 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 
-@Processor(process.env.WORKER_SECOND_QUEUE)
+@Processor(process.env.SECOND_QUEUE_NAME)
 export class SecondConsumer extends WorkerHost {
   private readonly logger = new Logger(SecondConsumer.name);
 

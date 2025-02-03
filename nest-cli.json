@@ -6,7 +6,16 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": false,
-    "tsConfigPath": "apps/queuetie-monorepo/tsconfig.app.json"
+    "tsConfigPath": "apps/queuetie-monorepo/tsconfig.app.json",
+    "plugins": [
+      {
+        "name": "@nestjs/swagger",
+        "options": {
+          "classValidatorShim": true,
+          "introspectComments": true
+        }
+      }
+    ]
   },
   "monorepo": true,
   "root": "apps/queuetie-monorepo",

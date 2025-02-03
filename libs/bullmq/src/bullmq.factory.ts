@@ -11,9 +11,11 @@ export const BullmqFactory = (configService: ConfigService<RedisConfig>): QueueO
       port,
     },
     defaultJobOptions: {
-      removeOnComplete: true,
+      removeOnComplete: {
+        age: 60 * 5,
+      },
       removeOnFail: {
-        age: 48 * 3600,
+        age: 60 * 5,
       },
     },
   };

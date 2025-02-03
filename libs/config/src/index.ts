@@ -5,8 +5,8 @@ type EnvSchema = {
   LOGGER_PRETTY: boolean;
   REDIS_HOST: string;
   REDIS_PORT: number;
-  WORKER_FIRST_QUEUE: string;
-  WORKER_SECOND_QUEUE: string;
+  FIRST_QUEUE_NAME: string;
+  SECOND_QUEUE_NAME: string;
   GATEWAY_CORS_ORIGIN: string;
   GATEWAY_SOCKET_CHANNEL_BROADCAST: string;
   GATEWAY_SOCKET_CHANNEL_NOTIFICATION: string;
@@ -24,4 +24,4 @@ declare global {
 export * from './pino';
 export * from './gateway';
 export * from './redis';
-export * from './worker';
+export * from './queue';
