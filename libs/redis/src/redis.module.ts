@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RedisService } from './redis.service';
-import { RedisClientToken, RedisFactory } from './redis.factory';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { redisConfig } from '@queuetie/config';
+import { RedisClientToken, RedisFactory } from './redis.factory';
+import { RedisService } from './redis.service';
 
 @Module({
   imports: [ConfigModule.forFeature(redisConfig)],
@@ -14,6 +14,6 @@ import { redisConfig } from '@queuetie/config';
       inject: [ConfigService],
     },
   ],
-  exports: [RedisService],
+  exports: [RedisService, RedisClientToken],
 })
 export class RedisModule {}

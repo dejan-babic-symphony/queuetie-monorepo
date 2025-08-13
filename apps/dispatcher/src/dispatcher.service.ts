@@ -1,8 +1,8 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { SimulateRequest } from './dto';
 import { JobType } from './constants';
+import { SimulateRequest } from './dto';
 
 @Injectable()
 export class DispatcherService {
@@ -26,6 +26,8 @@ export class DispatcherService {
 
       await queueHandler.add(resolvedName, echo, {
         delay: randomDelay,
+        removeOnComplete: { age: 60 },
+        removeOnFail: { age: 60 },
       });
     });
 
@@ -48,7 +50,7 @@ export class DispatcherService {
   private resolveName(type: JobType) {
     switch (type) {
       case JobType.SINGLE:
-        return 'QtSingle';
+        return 'Queuetie Job';
       default:
         throw new BadRequestException(`Job type [${type as string}] is not configured`);
     }

@@ -1,11 +1,30 @@
 version: '3.4'
 
 services:
+  dashboard:
+    container_name: queuetie-dashboard
+    build:
+      context: .
+      dockerfile: docker/dashboard/Dockerfile
+      target: development
+    command: /bin/sh -c "npx vite --host"
+    env_file:
+      - .env.docker
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '5173:5173'
+    volumes:
+      - './apps/dashboard/src:/app/src'
+      - './apps/dashboard/public:/app/public'
+      - './apps/dashboard/index.html:/app/index.html'
+    networks:
+      - queuetie
   gateway:
     container_name: queuetie-gateway
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/nestjs/Dockerfile
       target: development
       args:
         APP_NAME: gateway
@@ -25,7 +44,7 @@ services:
     container_name: queuetie-dispatcher
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/nestjs/Dockerfile
       target: development
       args:
         APP_NAME: dispatcher
@@ -45,7 +64,7 @@ services:
     container_name: queuetie-worker
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/nestjs/Dockerfile
       target: development
       args:
         APP_NAME: worker
@@ -91,7 +110,9 @@ services:
       timeout: 5s
 networks:
   queuetie:
+    name: queuetie
     driver: bridge
 volumes:
   redis:
+    name: queuetie-redis
     driver: local

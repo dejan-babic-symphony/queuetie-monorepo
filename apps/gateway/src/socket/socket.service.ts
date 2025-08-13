@@ -1,4 +1,6 @@
 import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { OnEvent } from '@nestjs/event-emitter';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -8,13 +10,22 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { authMiddleware } from './socket.middleware';
+import {
+  EventType,
+  GatewayChannels,
+  GatewayConfig,
+  GatewayNotification,
+  GatewayNotificationType,
+  GatewayProgress,
+  JobsCompletedEvent,
+  JobsDispatchingEvent,
+  JobsProgressEvent,
+  SimulateClient,
+} from '@queuetie/types';
 import { Server, Socket } from 'socket.io';
-import { UUID } from 'crypto';
-import { GatewayChannels, GatewayConfig, GatewayNotification } from '@queuetie/types';
-import { ConfigService } from '@nestjs/config';
 import { BroadcastRequestDto } from '../dto/broadcast.request.dto';
 import { SocketFilter } from './socket.filter';
+import { authMiddleware } from './socket.middleware';
 
 @WebSocketGateway({
   cors: {
@@ -25,7 +36,8 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(SocketService.name);
-  private readonly clientSocketMap: Map<string, string> = new Map();
+  private readonly socketIdToClientMap: Map<string, SimulateClient> = new Map();
+  private readonly clientIdToSocketIdMap: Map<string, string> = new Map();
   private readonly channels: GatewayChannels;
 
   constructor(private readonly configService: ConfigService<GatewayConfig>) {
@@ -38,19 +50,31 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
   }
 
   handleConnection(socket: Socket) {
-    const { clientid: clientId } = socket.handshake.headers;
+    const clientId = Array.isArray(socket.handshake.headers.clientid)
+      ? socket.handshake.headers.clientid[0]
+      : socket.handshake.headers.clientid;
+
+    const clientName = Array.isArray(socket.handshake.headers.clientname)
+      ? socket.handshake.headers.clientname[0]
+      : socket.handshake.headers.clientname;
+
+    const client: SimulateClient = { id: clientId, name: clientName };
 
     this.logger.log(`Socket created for clientId ${clientId}`);
 
-    this.clientSocketMap.set(clientId as UUID, socket.id);
-    socket.emit(this.channels.NOTIFICATION, 'QT connected');
+    this.socketIdToClientMap.set(socket.id, client);
+    this.clientIdToSocketIdMap.set(clientId, socket.id);
+
+    const notification = this.createNotification('Socket connected', 'socket_connect');
+
+    this.sendNotificationToClient(clientId, notification);
   }
 
   handleDisconnect(socket: Socket) {
-    for (const [clientId, socketId] of this.clientSocketMap) {
+    for (const [socketId, client] of this.socketIdToClientMap) {
       if (socketId === socket.id) {
-        this.logger.log(`Socket closed for clientId ${clientId}`);
-        this.clientSocketMap.delete(clientId);
+        this.logger.log(`Socket closed for clientId ${client.id}`);
+        this.socketIdToClientMap.delete(socket.id);
         break;
       }
     }
@@ -67,26 +91,75 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
     }
 
     if (broadcast.scope === 'client') {
-      this.sendMessageToClient(broadcast.target, broadcast.notification);
+      this.sendNotificationToClient(broadcast.target, broadcast.notification);
     }
   }
 
-  sendProgressToClient(clientId: string, payload: any) {
-    const socketId = this.clientSocketMap.get(clientId);
+  @OnEvent(EventType.JOBS_DISPATCHING)
+  handleJobsDispatchingEvent(event: JobsDispatchingEvent) {
+    this.logger.log({ event }, `Processing ${EventType.JOBS_DISPATCHING} event`);
+
+    const { clientId, dispatchedJobs } = event;
+    const socketId = this.clientIdToSocketIdMap.get(clientId);
+    const client = this.socketIdToClientMap.get(socketId);
+
+    const message = `Dispatched ${dispatchedJobs} job${dispatchedJobs > 1 ? 's' : ''}`;
+    const notification = this.createNotification(message, 'jobs_dispatching', client.name);
+
+    this.sendNotificationToClient(clientId, notification);
+  }
+
+  @OnEvent(EventType.JOBS_PROGRESS)
+  handleJobsProgressEvent(event: JobsProgressEvent) {
+    this.logger.log({ event }, `Processing ${EventType.JOBS_PROGRESS} event`);
+    this.sendProgressToClient(event.clientId, event);
+  }
+
+  @OnEvent(EventType.JOBS_COMPLETED)
+  handleJobsCompletedEvent(event: JobsCompletedEvent) {
+    this.logger.log({ event }, `Processing ${EventType.JOBS_COMPLETED} event`);
+
+    const { clientId, dispatchedJobs } = event;
+
+    const message = `Processed ${dispatchedJobs} job${dispatchedJobs > 1 ? 's' : ''}`;
+    const notification = this.createNotification(message, 'jobs_completed');
+
+    this.sendProgressToClient(clientId, event);
+    this.sendNotificationToClient(clientId, notification);
+  }
+
+  sendProgressToClient(clientId: string, progress: GatewayProgress) {
+    const socketId = this.clientIdToSocketIdMap.get(clientId);
     if (socketId) {
-      this.server.to(socketId).emit('progress', payload);
+      this.logger.log({ progress }, `Sending progress to client ${clientId}`);
+      this.server.to(socketId).emit(this.channels.PROGRESS, progress);
     } else {
       this.logger.error(`Client ${clientId} not found`);
     }
   }
 
-  sendMessageToClient(clientId: string, notification: GatewayNotification) {
-    const socketId = this.clientSocketMap.get(clientId);
+  sendNotificationToClient(clientId: string, notification: GatewayNotification) {
+    const socketId = this.clientIdToSocketIdMap.get(clientId);
     if (socketId) {
-      this.logger.log(`Sending message to client ${clientId}`, { notification });
+      this.logger.log({ notification }, `Sending notification to client ${clientId}`);
       this.server.to(socketId).emit(this.channels.NOTIFICATION, notification);
     } else {
       this.logger.error(`Client ${clientId} not found`);
     }
+  }
+
+  private createNotification(
+    message: string,
+    type: GatewayNotificationType,
+    from: string = 'Queuetie'
+  ) {
+    const notification: GatewayNotification = {
+      message,
+      type,
+      from,
+      timestamp: new Date().toISOString(),
+    };
+
+    return notification;
   }
 }

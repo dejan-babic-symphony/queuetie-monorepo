@@ -3,7 +3,6 @@ import { BullmqModule } from '@queuetie/bullmq';
 import { queueConfig } from '@queuetie/config';
 import { ConfigModule } from '@nestjs/config';
 import { FirstConsumer } from './first.consumer';
-import { BullModule } from '@nestjs/bullmq';
 import { SecondConsumer } from './second.consumer';
 import { PinoModule } from '@queuetie/pino';
 

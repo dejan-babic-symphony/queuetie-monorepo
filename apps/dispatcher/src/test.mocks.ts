@@ -6,9 +6,10 @@ export const JobRequestMock = {
   queue: process.env.FIRST_QUEUE_NAME,
   delay: 10,
   echo: {
+    id: 'fca54916-3a62-4134-95e0-9fe214f9fbed' as UUID,
     total: 500,
     context: '56d74e7e-f0ad-4841-af20-6ce9e5130b99' as UUID,
-    user: {
+    client: {
       id: '84cb95cd-0de9-48c6-b702-917fba0594fb' as UUID,
       name: 'John Doe',
     },

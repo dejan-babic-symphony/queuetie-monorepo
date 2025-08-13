@@ -1,5 +1,5 @@
 # Base image
-FROM node:22.12.0-alpine3.21 AS development
+FROM node:22-alpine AS development
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -19,7 +19,7 @@ ARG APP_NAME
 RUN npm run build ${APP_NAME}
 
 # Production image
-FROM node:22.12.0-alpine3.21 AS production
+FROM node:22-alpine AS production
 
 USER node
 

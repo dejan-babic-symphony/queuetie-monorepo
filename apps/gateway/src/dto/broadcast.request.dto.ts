@@ -1,4 +1,4 @@
-import { GatewayBroadcast, GatewayNotification } from '@queuetie/types';
+import { GatewayBroadcast, GatewayNotification, GatewayNotificationType } from '@queuetie/types';
 import { Type } from 'class-transformer';
 import { IsIn, IsNotEmpty, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { UUID } from 'crypto';
@@ -6,10 +6,21 @@ import { UUID } from 'crypto';
 export class GatewayNotificationDto implements GatewayNotification {
   @IsString()
   @IsNotEmpty()
-  message: string;
+  from: string;
   @IsString()
   @IsNotEmpty()
-  type: string;
+  timestamp: string;
+  @IsString()
+  @IsNotEmpty()
+  message: string;
+  @IsIn([
+    'socket_connect',
+    'socket_disconnect',
+    'jobs_dispatching',
+    'jobs_completed',
+    'jobs_progress',
+  ])
+  type: GatewayNotificationType;
 }
 
 export class BroadcastRequestDto implements GatewayBroadcast {

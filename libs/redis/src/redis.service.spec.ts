@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { RedisService } from './redis.service';
-import { RedisClientToken, RedisFactory } from './redis.factory';
-import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import Redis from 'ioredis';
+import { RedisClientToken, RedisFactory } from './redis.factory';
+import { RedisService } from './redis.service';
 
 const RedisMock = {
   incr: jest.fn(),
+  set: jest.fn(),
 };
 
 describe('RedisService', () => {
@@ -31,8 +32,8 @@ describe('RedisService', () => {
     redis = module.get(RedisClientToken);
   });
 
-  it('should call the redis client incr with the provided key', () => {
-    service.increment('test');
+  it('should call the redis client incr with the provided key', async () => {
+    await service.increment('test');
     expect(redis.incr).toHaveBeenCalledWith('test');
   });
 });

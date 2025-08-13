@@ -1,3 +1,11 @@
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  SimulateClient,
+  SimulateEcho,
+  SimulateOrganization,
+  SimulateRequestType,
+} from '@queuetie/types/dispatcher';
+import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsIn,
@@ -9,18 +17,10 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { UUID } from 'crypto';
-import {
-  SimulateEcho,
-  SimulateOrganization,
-  SimulateRequestType,
-  SimulateUser,
-} from '@queuetie/types/dispatcher';
 import { JobType } from '../constants';
 
-export class User implements SimulateUser {
+export class User implements SimulateClient {
   @ApiProperty({
     description: 'The id of the user sending the request',
     default: '84cb95cd-0de9-48c6-b702-917fba0594fb',
@@ -83,7 +83,7 @@ export class Echo implements SimulateEcho {
   })
   @ValidateNested()
   @Type(() => User)
-  user: User;
+  client: User;
 
   @ApiProperty({
     description: 'Organization details used for emitting messages',

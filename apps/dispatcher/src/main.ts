@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { DispatcherModule } from './dispatcher.module';
 import {
   DocumentBuilder,
-  SwaggerDocumentOptions,
   SwaggerCustomOptions,
+  SwaggerDocumentOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
+import { DispatcherModule } from './dispatcher.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(DispatcherModule);
@@ -32,6 +32,8 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config, options);
 
   SwaggerModule.setup('/', app, documentFactory, custom);
+
+  app.enableCors({ origin: '*' });
 
   await app.listen(process.env.port ?? 3000);
 }

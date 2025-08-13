@@ -1,0 +1,1 @@
+export { DiceBearAvatar } from './DiceBearAvatar';
