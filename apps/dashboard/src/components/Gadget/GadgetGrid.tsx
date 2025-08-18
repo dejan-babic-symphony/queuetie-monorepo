@@ -1,18 +1,18 @@
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import { GadgetGridProps } from './types';
-import { Gadget } from './Gadget';
-import { Grow } from '@mui/material';
 import {
   closestCenter,
   DndContext,
+  DragEndEvent,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core';
 import { arrayMove, rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import { Grow } from '@mui/material';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import { SortableItem } from '../SortableItem';
+import { Gadget } from './Gadget';
+import { GadgetGridProps } from './types';
 
 export const GadgetGrid: React.FC<GadgetGridProps> = ({ gadgets, show, onReorder: reorder }) => {
   const boxSx = {
@@ -42,7 +42,10 @@ export const GadgetGrid: React.FC<GadgetGridProps> = ({ gadgets, show, onReorder
     <>
       {show && (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={gadgets} strategy={rectSortingStrategy}>
+          <SortableContext
+            items={gadgets.map((gadget) => gadget.id)}
+            strategy={rectSortingStrategy}
+          >
             <Box sx={boxSx}>
               <Grid
                 container
@@ -52,7 +55,7 @@ export const GadgetGrid: React.FC<GadgetGridProps> = ({ gadgets, show, onReorder
                 sx={gridSx}
               >
                 {gadgets.map((gadget) => (
-                  <Grow key={gadget.id} in={gadget.visible} timeout={500}>
+                  <Grow key={gadget.id} in={gadget.isVisible} timeout={500}>
                     <Grid>
                       <SortableItem id={gadget.id}>
                         <Gadget {...gadget} />

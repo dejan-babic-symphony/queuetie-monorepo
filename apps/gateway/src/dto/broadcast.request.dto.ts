@@ -19,13 +19,19 @@ export class GatewayNotificationDto implements GatewayNotification {
     'jobs_dispatching',
     'jobs_completed',
     'jobs_progress',
+    'broadcast_client',
+    'broadcast_organization',
+    'broadcast_queuetie',
+    'gadget_join',
+    'gadget_leave',
+    'gadget_remove',
   ])
   type: GatewayNotificationType;
 }
 
 export class BroadcastRequestDto implements GatewayBroadcast {
-  @IsIn(['client', 'queuetie'])
-  scope: 'client' | 'queuetie';
+  @IsIn(['client', 'organization', 'queuetie'])
+  scope: 'client' | 'organization' | 'queuetie';
   @IsUUID()
   target: UUID;
   @ValidateNested()

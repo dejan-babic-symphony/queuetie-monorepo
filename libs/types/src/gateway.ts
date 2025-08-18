@@ -14,7 +14,15 @@ export type GatewayNotificationType =
   | 'socket_disconnect'
   | 'jobs_dispatching'
   | 'jobs_completed'
-  | 'jobs_progress';
+  | 'jobs_progress'
+  | 'broadcast_client'
+  | 'broadcast_organization'
+  | 'broadcast_queuetie'
+  | 'gadget_join'
+  | 'gadget_leave'
+  | 'gadget_remove';
+
+export type GatewayBroadcastType = 'client' | 'organization' | 'queuetie';
 
 export type GatewayNotification = {
   type: GatewayNotificationType;
@@ -23,15 +31,15 @@ export type GatewayNotification = {
   timestamp: string;
 };
 
+export interface GatewayBroadcast {
+  target: UUID;
+  scope: GatewayBroadcastType;
+  notification: GatewayNotification;
+}
+
 export type GatewayProgress = {
   clientId: string;
   completed: number;
   context: string;
   dispatchedJobs: number;
 };
-
-export interface GatewayBroadcast {
-  scope: 'client' | 'queuetie';
-  target: UUID;
-  notification: GatewayNotification;
-}

@@ -1,16 +1,21 @@
-import { FC, useEffect } from 'react';
-import { DiceBearProps, DiceBearVariant } from './types';
 import { Avatar } from '@mui/material';
+import { FC, useCallback, useEffect } from 'react';
+import { DiceBearProps, DiceBearVariant } from './types';
 
-export const DiceBearAvatar: FC<DiceBearProps> = ({ seed, variant = DiceBearVariant.BOTTTS }) => {
+export const DiceBearAvatar: FC<DiceBearProps> = ({
+  seed,
+  variant = DiceBearVariant.BOTTTS,
+  size,
+}) => {
+  const getDiceUrl = useCallback(
+    () => `https://api.dicebear.com/9.x/${variant}/svg?seed=${encodeURIComponent(seed.trim())}`,
+    [variant, seed]
+  );
+
   useEffect(() => {
     const img = new window.Image();
     img.src = getDiceUrl();
-  }, [seed]);
-
-  const getDiceUrl = () => {
-    return `https://api.dicebear.com/9.x/${variant}/svg?seed=${encodeURIComponent(seed.trim())}`;
-  };
+  }, [getDiceUrl, seed]);
 
   const getInitials = () => {
     return seed
@@ -22,7 +27,12 @@ export const DiceBearAvatar: FC<DiceBearProps> = ({ seed, variant = DiceBearVari
   };
 
   return (
-    <Avatar aria-label="avatars" src={getDiceUrl()}>
+    <Avatar
+      aria-label="avatars"
+      variant="square"
+      src={getDiceUrl()}
+      sx={{ width: size ?? 36, height: size ?? 36 }}
+    >
       {getInitials()}
     </Avatar>
   );

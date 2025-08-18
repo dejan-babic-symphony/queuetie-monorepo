@@ -1,5 +1,8 @@
 import AddToQueueIcon from '@mui/icons-material/AddToQueueOutlined';
+import CampaignIcon from '@mui/icons-material/Campaign';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import MessageIcon from '@mui/icons-material/MessageOutlined';
 import PowerOffIcon from '@mui/icons-material/PowerOffOutlined';
 import PowerIcon from '@mui/icons-material/PowerOutlined';
@@ -16,6 +19,10 @@ export const GadgetNotifications: FC<GadgetNotificationsProps> = ({ notification
     socket_disconnect: <PowerOffIcon fontSize="medium" color="error" />,
     jobs_dispatching: <AddToQueueIcon fontSize="medium" color="primary" />,
     jobs_completed: <CheckCircleOutlineIcon fontSize="medium" color="primary" />,
+    broadcast_organization: <CampaignIcon fontSize="medium" color="primary" />,
+    broadcast_client: <CampaignIcon fontSize="medium" color="primary" />,
+    gadget_join: <GroupAddIcon fontSize="medium" color="primary" />,
+    gadget_leave: <GroupRemoveIcon fontSize="medium" color="error" />,
   };
 
   const sortedNotifications = [...notifications].sort((a, b) =>

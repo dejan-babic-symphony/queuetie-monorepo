@@ -1,9 +1,9 @@
 import { SocketMiddleware } from '@queuetie/types';
 
 export const authMiddleware: SocketMiddleware = (socket, next) => {
-  const { token, clientid } = socket.handshake.headers;
+  const { token, clientid, organizationid } = socket.handshake.headers;
 
-  const isAuthorized = Boolean(token === 'let-me-in' && clientid);
+  const isAuthorized = Boolean(token === 'let-me-in' && clientid && organizationid);
 
   if (!isAuthorized) {
     next(new Error('Unauthorized'));

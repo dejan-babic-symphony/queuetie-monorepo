@@ -1,8 +1,9 @@
 import MonitorIcon from '@mui/icons-material/Monitor';
 import NotificationIcon from '@mui/icons-material/Notifications';
-import { Badge, CardHeader, IconButton } from '@mui/material';
+import { Badge, Box, CardHeader, IconButton } from '@mui/material';
 import React from 'react';
 import { DiceBearAvatar } from '../DiceBear';
+import { DiceBearVariant } from '../DiceBear/types';
 import { GadgetHeaderProps } from './types';
 
 export const GadgetHeader: React.FC<GadgetHeaderProps> = ({
@@ -26,8 +27,13 @@ export const GadgetHeader: React.FC<GadgetHeaderProps> = ({
           <DiceBearAvatar seed={userName} />
         </Badge>
       }
-      title={userName ?? 'John Doe'}
-      subheader={organizationName ?? 'Acme'}
+      title={userName}
+      subheader={
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {organizationName}
+          <DiceBearAvatar seed={organizationName} size={12} variant={DiceBearVariant.IDENTICON} />
+        </Box>
+      }
       action={
         <>
           <IconButton

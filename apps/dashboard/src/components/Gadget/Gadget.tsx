@@ -1,27 +1,46 @@
+import { faker } from '@faker-js/faker';
 import AddToQueueIcon from '@mui/icons-material/AddToQueue';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import MarkChatReadIcon from '@mui/icons-material/MarkChatRead';
 import PowerIcon from '@mui/icons-material/Power';
 import PowerOffIcon from '@mui/icons-material/PowerOff';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { Card, CardActions, CardContent, IconButton } from '@mui/material';
-import { GatewayNotification, GatewayProgress, SimulateRequestType } from '@queuetie/types';
+import {
+  GatewayBroadcast,
+  GatewayNotification,
+  GatewayProgress,
+  SimulateRequestType,
+} from '@queuetie/types';
+import { UUID } from 'crypto';
 import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useGadgetControl } from '../../hooks/useGadgetControl';
 import { useSocket } from '../../hooks/useSocket';
-import { useDispatchSimulateMutation } from '../../queries/dispatcher';
+import { useBroadcastMutation, useDispatchSimulateMutation } from '../../queries/dispatcher';
 import { GadgetContentSlider } from './GadgetContentSlider';
 import { GadgetHeader } from './GadgetHeader';
 import { GadgetNotifications } from './GadgetNotifications';
 import { GadgetProgressGrid } from './GadgetProgressGrid';
 import { GadgetProps } from './types';
-
-export const Gadget: React.FC<GadgetProps> = ({ client, organization }) => {
+export const Gadget: React.FC<GadgetProps> = ({
+  client,
+  organization,
+  isGroup,
+  onGroup: handleGroupAdd,
+  onGroupLeave: handleGroupLeave,
+  onRemove: handleRemove,
+}) => {
   const { socket } = useSocket(client, organization);
   const [socketOn, setSocketOn] = useState<boolean>(false);
   const [contentToggled, setContentToggled] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<GatewayNotification[]>([]);
   const { register, available, associate, update } = useGadgetControl();
   const { mutate: dispatchSimulate } = useDispatchSimulateMutation();
+  const { mutate: broadcast } = useBroadcastMutation();
 
   // Derived values
   const dispatchEnabled = !!(available.length && socketOn);
@@ -68,7 +87,7 @@ export const Gadget: React.FC<GadgetProps> = ({ client, organization }) => {
     [update]
   );
 
-  //Job dispatching handlers
+  // Job dispatching handlers
   const handleSimulateDispatch = () => {
     const id = available.reverse().slice(-1)[0];
     const context = uuidv4();
@@ -88,6 +107,25 @@ export const Gadget: React.FC<GadgetProps> = ({ client, organization }) => {
       },
     };
     dispatchSimulate(payload);
+  };
+
+  // Broadcasting handlers
+  const handleBroadcast = () => {
+    const message = `${faker.word.adjective()} ${faker.word.noun()} ${faker.word.verb()}`;
+    const notification: GatewayNotification = {
+      type: 'broadcast_organization',
+      message,
+      from: client.name,
+      timestamp: new Date().toISOString(),
+    };
+
+    const broadcastPayload: GatewayBroadcast = {
+      target: organization.id as UUID,
+      scope: 'organization',
+      notification,
+    };
+
+    broadcast({ socket, broadcast: broadcastPayload });
   };
   useEffect(() => {
     if (socket) {
@@ -133,6 +171,9 @@ export const Gadget: React.FC<GadgetProps> = ({ client, organization }) => {
         >
           {socketOn ? <PowerIcon color="success" /> : <PowerOffIcon color="disabled" />}
         </IconButton>
+        <IconButton aria-label="Configure jobs" title="Configure jobs" disabled={!dispatchEnabled}>
+          <SettingsIcon />
+        </IconButton>
         <IconButton
           aria-label="Dispatch jobs"
           title="Dispatch jobs"
@@ -141,16 +182,41 @@ export const Gadget: React.FC<GadgetProps> = ({ client, organization }) => {
         >
           <AddToQueueIcon />
         </IconButton>
-        {!contentToggled && (
-          <IconButton
-            aria-label="Clear notifications"
-            title="Clear notifications"
-            onClick={handleClearNotifications}
-            disabled={notifications.length === 0}
-          >
-            <MarkChatReadIcon />
-          </IconButton>
-        )}
+        <IconButton
+          aria-label={`Add Gadget to ${organization.name}`}
+          title={`Add Gadget to ${organization.name}`}
+          onClick={handleGroupAdd}
+        >
+          <GroupAddIcon />
+        </IconButton>
+        <IconButton
+          aria-label={`Leave ${organization.name}`}
+          title={`Leave ${organization.name}`}
+          onClick={handleGroupLeave}
+          disabled={!isGroup}
+        >
+          <ExitToAppIcon />
+        </IconButton>
+
+        <IconButton
+          aria-label="Broadcast to group"
+          title="Broadcast to group"
+          onClick={handleBroadcast}
+        >
+          <CampaignIcon />
+        </IconButton>
+
+        <IconButton
+          aria-label="Clear notifications"
+          title="Clear notifications"
+          onClick={handleClearNotifications}
+          disabled={notifications.length === 0 || contentToggled}
+        >
+          <MarkChatReadIcon />
+        </IconButton>
+        <IconButton aria-label={`Remove Gadget`} title={`Remove Gadget`} onClick={handleRemove}>
+          <DeleteIcon />
+        </IconButton>
       </CardActions>
     </Card>
   );

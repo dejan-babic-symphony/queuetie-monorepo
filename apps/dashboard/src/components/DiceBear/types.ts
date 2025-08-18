@@ -12,4 +12,5 @@ export enum DiceBearVariant {
 export type DiceBearProps = {
   seed: string;
   variant?: DiceBearVariant;
+  size?: number;
 };

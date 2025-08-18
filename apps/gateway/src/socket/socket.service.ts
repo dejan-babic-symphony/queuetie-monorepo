@@ -2,6 +2,7 @@ import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/websockets';
 import {
   EventType,
+  GatewayBroadcast,
   GatewayChannels,
   GatewayConfig,
   GatewayNotification,
@@ -21,7 +23,9 @@ import {
   JobsDispatchingEvent,
   JobsProgressEvent,
   SimulateClient,
+  SimulateOrganization,
 } from '@queuetie/types';
+import { UUID } from 'crypto';
 import { Server, Socket } from 'socket.io';
 import { BroadcastRequestDto } from '../dto/broadcast.request.dto';
 import { SocketFilter } from './socket.filter';
@@ -36,9 +40,12 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(SocketService.name);
-  private readonly socketIdToClientMap: Map<string, SimulateClient> = new Map();
-  private readonly clientIdToSocketIdMap: Map<string, string> = new Map();
   private readonly channels: GatewayChannels;
+  private readonly clientIdToSocketIdMap: Map<string, string> = new Map();
+  private readonly socketIdToClientAndOrganizationMap: Map<
+    string,
+    { client: SimulateClient; organization: SimulateOrganization }
+  > = new Map();
 
   constructor(private readonly configService: ConfigService<GatewayConfig>) {
     this.channels = this.configService.get('channels');
@@ -49,7 +56,7 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
     this.logger.log({ channels: this.channels }, 'Server is ready');
   }
 
-  handleConnection(socket: Socket) {
+  async handleConnection(socket: Socket) {
     const clientId = Array.isArray(socket.handshake.headers.clientid)
       ? socket.handshake.headers.clientid[0]
       : socket.handshake.headers.clientid;
@@ -58,23 +65,58 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
       ? socket.handshake.headers.clientname[0]
       : socket.handshake.headers.clientname;
 
+    const organizationId = Array.isArray(socket.handshake.headers.organizationid)
+      ? socket.handshake.headers.organizationid[0]
+      : socket.handshake.headers.organizationid;
+
+    const organizationName = Array.isArray(socket.handshake.headers.organizationname)
+      ? socket.handshake.headers.organizationname[0]
+      : socket.handshake.headers.organizationname;
+
+    await socket.join(organizationId);
+
     const client: SimulateClient = { id: clientId, name: clientName };
+    const organization: SimulateOrganization = { id: organizationId, name: organizationName };
 
-    this.logger.log(`Socket created for clientId ${clientId}`);
+    this.logger.log({ client, organization }, 'Socket created');
 
-    this.socketIdToClientMap.set(socket.id, client);
+    this.socketIdToClientAndOrganizationMap.set(socket.id, { client, organization });
     this.clientIdToSocketIdMap.set(clientId, socket.id);
 
-    const notification = this.createNotification('Socket connected', 'socket_connect');
+    const socketConnectNotification = this.createNotification('Socket connected', 'socket_connect');
+    const gadgetJoinNotification = this.createNotification(
+      `${clientName} joined group`,
+      'gadget_join',
+      organizationName
+    );
+    const broadcast: GatewayBroadcast = {
+      target: organizationId as UUID,
+      scope: 'organization',
+      notification: gadgetJoinNotification,
+    };
 
-    this.sendNotificationToClient(clientId, notification);
+    this.broadcastToOrganization(socket, broadcast);
+    this.sendNotificationToClient(clientId, socketConnectNotification);
   }
 
   handleDisconnect(socket: Socket) {
-    for (const [socketId, client] of this.socketIdToClientMap) {
+    for (const [socketId, { client, organization }] of this.socketIdToClientAndOrganizationMap) {
       if (socketId === socket.id) {
         this.logger.log(`Socket closed for clientId ${client.id}`);
-        this.socketIdToClientMap.delete(socket.id);
+
+        this.socketIdToClientAndOrganizationMap.delete(socket.id);
+        const gadgetJoinNotification = this.createNotification(
+          `${client.name} left group`,
+          'gadget_leave',
+          organization.name
+        );
+        const broadcast: GatewayBroadcast = {
+          target: organization.id as UUID,
+          scope: 'organization',
+          notification: gadgetJoinNotification,
+        };
+
+        this.broadcastToOrganization(socket, broadcast);
         break;
       }
     }
@@ -83,16 +125,26 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
   @SubscribeMessage(process.env.GATEWAY_SOCKET_CHANNEL_BROADCAST)
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @UseFilters(SocketFilter)
-  handleBroadcast(@MessageBody() broadcast: BroadcastRequestDto) {
-    this.logger.log({ broadcast }, 'Broadcasting');
+  handleBroadcast(
+    @MessageBody() broadcast: BroadcastRequestDto,
+    @ConnectedSocket() senderSocket: Socket
+  ) {
+    this.logger.log(
+      { broadcast },
+      `Broadcast received on ${process.env.GATEWAY_SOCKET_CHANNEL_BROADCAST} channel`
+    );
 
-    if (broadcast.scope === 'queuetie') {
-      this.server.emit(this.channels.NOTIFICATION, broadcast.notification);
+    if (broadcast.scope === 'organization') {
+      this.broadcastToOrganization(senderSocket, broadcast);
     }
 
-    if (broadcast.scope === 'client') {
-      this.sendNotificationToClient(broadcast.target, broadcast.notification);
-    }
+    // if (broadcast.scope === 'queuetie') {
+    //   this.server.emit(this.channels.NOTIFICATION, broadcast.notification);
+    // }
+
+    // if (broadcast.scope === 'client') {
+    //   this.sendNotificationToClient(broadcast.target, broadcast.notification);
+    // }
   }
 
   @OnEvent(EventType.JOBS_DISPATCHING)
@@ -101,7 +153,7 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
 
     const { clientId, dispatchedJobs } = event;
     const socketId = this.clientIdToSocketIdMap.get(clientId);
-    const client = this.socketIdToClientMap.get(socketId);
+    const { client } = this.socketIdToClientAndOrganizationMap.get(socketId);
 
     const message = `Dispatched ${dispatchedJobs} job${dispatchedJobs > 1 ? 's' : ''}`;
     const notification = this.createNotification(message, 'jobs_dispatching', client.name);
@@ -141,11 +193,15 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect, 
   sendNotificationToClient(clientId: string, notification: GatewayNotification) {
     const socketId = this.clientIdToSocketIdMap.get(clientId);
     if (socketId) {
-      this.logger.log({ notification }, `Sending notification to client ${clientId}`);
+      this.logger.log({ notification, clientId }, 'Sending notification to client');
       this.server.to(socketId).emit(this.channels.NOTIFICATION, notification);
     } else {
-      this.logger.error(`Client ${clientId} not found`);
+      this.logger.error({ clientId }, 'Client not found');
     }
+  }
+
+  broadcastToOrganization(socket: Socket, broadcast: BroadcastRequestDto) {
+    socket.to(broadcast.target).emit(this.channels.NOTIFICATION, broadcast.notification);
   }
 
   private createNotification(

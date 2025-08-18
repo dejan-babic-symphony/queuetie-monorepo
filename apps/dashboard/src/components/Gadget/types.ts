@@ -16,9 +16,13 @@ export type GadgetEntity = {
 
 export type GadgetProps = {
   id: string;
-  visible: boolean;
+  isVisible: boolean;
+  isGroup: boolean;
   client: GadgetEntity;
   organization: GadgetEntity;
+  onGroup: () => void;
+  onGroupLeave: () => void;
+  onRemove: () => void;
 };
 
 export type GadgetHeaderProps = {
