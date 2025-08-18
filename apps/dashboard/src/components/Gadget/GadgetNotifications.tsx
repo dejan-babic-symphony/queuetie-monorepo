@@ -9,9 +9,10 @@ import PowerIcon from '@mui/icons-material/PowerOutlined';
 import { Alert, Box, SxProps, Typography } from '@mui/material';
 import { GatewayNotificationType } from '@queuetie/types';
 import { compareDesc, differenceInMinutes, format, formatDistanceToNow, parseISO } from 'date-fns';
-import { FC, ReactNode } from 'react';
-import { GadgetNotificationsProps } from './types';
-export const GadgetNotifications: FC<GadgetNotificationsProps> = ({ notifications }) => {
+import { FC, ReactNode, useContext } from 'react';
+import { GadgetContext } from '../../providers/GadgetContext';
+export const GadgetNotifications: FC = () => {
+  const { notifications } = useContext(GadgetContext);
   const hasNotifications = notifications.length > 0;
 
   const iconMap: Partial<Record<GatewayNotificationType, ReactNode>> = {

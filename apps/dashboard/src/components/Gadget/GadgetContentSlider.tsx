@@ -1,12 +1,10 @@
 import { Box, Slide } from '@mui/material';
-import { CSSProperties, FC, useRef } from 'react';
+import { CSSProperties, FC, useContext, useRef } from 'react';
+import { GadgetContext } from '../../providers/GadgetContext';
 import { GadgetContentSliderProps } from './types';
 
-export const GadgetContentSlider: FC<GadgetContentSliderProps> = ({
-  notifications,
-  progress,
-  contentToggled,
-}) => {
+export const GadgetContentSlider: FC<GadgetContentSliderProps> = ({ notifications, progress }) => {
+  const { contentToggled } = useContext(GadgetContext);
   const contentRef = useRef<HTMLElement>(null);
 
   const contentContainerSx: CSSProperties = {

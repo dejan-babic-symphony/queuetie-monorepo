@@ -1,4 +1,3 @@
-import { GatewayNotification } from '@queuetie/types';
 import { ReactElement } from 'react';
 import { GadgetNotifications } from './GadgetNotifications';
 import { GadgetProgressGrid } from './GadgetProgressGrid';
@@ -25,15 +24,6 @@ export type GadgetProps = {
   onRemove: () => void;
 };
 
-export type GadgetHeaderProps = {
-  userName: string;
-  organizationName: string;
-  socketOn: boolean;
-  messagesCount: number;
-  onMonitorClick: () => void;
-  onNotificationClick: () => void;
-};
-
 export enum GadgetProgressStatus {
   Idle,
   Active,
@@ -46,16 +36,7 @@ export type GadgetProgressProps = {
   status: GadgetProgressStatus;
 };
 
-export type GadgetProgressGridProps = {
-  gadgetProgressProps: GadgetProgressProps[];
-};
-
 export type GadgetContentSliderProps = {
   notifications: ReactElement<typeof GadgetNotifications>;
   progress: ReactElement<typeof GadgetProgressGrid>;
-  contentToggled: boolean;
-};
-
-export type GadgetNotificationsProps = {
-  notifications: GatewayNotification[];
 };

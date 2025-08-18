@@ -1,7 +1,11 @@
 export { Gadget } from './Gadget';
 export { GadgetContentSlider } from './GadgetContentSlider';
 export { GadgetGrid } from './GadgetGrid';
+export { GadgetGroupActions } from './GadgetGroupActions';
 export { GadgetHeader } from './GadgetHeader';
+export { GadgetJobActions } from './GadgetJobActions';
+export { GadgetNotificationActions } from './GadgetNotificationActions';
 export { GadgetNotifications } from './GadgetNotifications';
 export { GadgetProgress } from './GadgetProgress';
 export { GadgetProgressGrid } from './GadgetProgressGrid';
+export { GadgetActions } from './GadgetActions';

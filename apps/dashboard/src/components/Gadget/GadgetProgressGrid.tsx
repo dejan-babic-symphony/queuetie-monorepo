@@ -1,8 +1,11 @@
 import { Stack } from '@mui/material';
+import { useContext } from 'react';
+import { GadgetContext } from '../../providers/GadgetContext';
 import { GadgetProgress } from './GadgetProgress';
-import { GadgetProgressGridProps } from './types';
 
-export const GadgetProgressGrid: React.FC<GadgetProgressGridProps> = ({ gadgetProgressProps }) => {
+export const GadgetProgressGrid: React.FC = () => {
+  const { gadgetProgressProps } = useContext(GadgetContext);
+
   return (
     <Stack
       direction="row"

@@ -1,0 +1,34 @@
+import DeleteIcon from '@mui/icons-material/Delete';
+import PowerIcon from '@mui/icons-material/Power';
+import PowerOffIcon from '@mui/icons-material/PowerOff';
+import { Box, Divider, IconButton } from '@mui/material';
+import { FC, useContext } from 'react';
+import { GadgetContext } from '../../providers/GadgetContext';
+import { GadgetGroupActions } from './GadgetGroupActions';
+import { GadgetJobActions } from './GadgetJobActions';
+import { GadgetNotificationActions } from './GadgetNotificationActions';
+
+export const GadgetActions: FC = () => {
+  const { socketOn, contentToggled, handleToggleSocket, handleRemove } = useContext(GadgetContext);
+
+  return (
+    <>
+      <IconButton
+        aria-label="Toggle socket connection"
+        title="Toggle the socket connection"
+        onClick={handleToggleSocket}
+      >
+        {socketOn ? <PowerIcon color="success" /> : <PowerOffIcon color="disabled" />}
+      </IconButton>
+      <Divider variant="middle" orientation="vertical" flexItem />
+      {contentToggled && <GadgetJobActions />}
+      {!contentToggled && <GadgetNotificationActions />}
+      <Divider variant="middle" orientation="vertical" flexItem />
+      <GadgetGroupActions />
+      <Box sx={{ flexGrow: 1 }} />
+      <IconButton aria-label={`Remove Gadget`} title={`Remove Gadget`} onClick={handleRemove}>
+        <DeleteIcon />
+      </IconButton>
+    </>
+  );
+};

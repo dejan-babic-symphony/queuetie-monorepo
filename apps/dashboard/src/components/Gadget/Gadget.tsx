@@ -1,14 +1,5 @@
 import { faker } from '@faker-js/faker';
-import AddToQueueIcon from '@mui/icons-material/AddToQueue';
-import CampaignIcon from '@mui/icons-material/Campaign';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import MarkChatReadIcon from '@mui/icons-material/MarkChatRead';
-import PowerIcon from '@mui/icons-material/Power';
-import PowerOffIcon from '@mui/icons-material/PowerOff';
-import SettingsIcon from '@mui/icons-material/Settings';
-import { Card, CardActions, CardContent, IconButton } from '@mui/material';
+import { Card, CardActions, CardContent } from '@mui/material';
 import {
   GatewayBroadcast,
   GatewayNotification,
@@ -20,7 +11,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useGadgetControl } from '../../hooks/useGadgetControl';
 import { useSocket } from '../../hooks/useSocket';
+import { GadgetProvider } from '../../providers/GadgetProvider';
 import { useBroadcastMutation, useDispatchSimulateMutation } from '../../queries/dispatcher';
+import { GadgetActions } from './GadgetActions';
 import { GadgetContentSlider } from './GadgetContentSlider';
 import { GadgetHeader } from './GadgetHeader';
 import { GadgetNotifications } from './GadgetNotifications';
@@ -69,6 +62,10 @@ export const Gadget: React.FC<GadgetProps> = ({
     socket?.[action]();
   };
 
+  const handleContentToggle = () => {
+    setContentToggled((previous) => !previous);
+  };
+
   // Socket notification handler
   const handleSocketNotification = (notification: GatewayNotification) => {
     setNotifications((previous) => [...previous, notification]);
@@ -110,7 +107,7 @@ export const Gadget: React.FC<GadgetProps> = ({
   };
 
   // Broadcasting handlers
-  const handleBroadcast = () => {
+  const handleGroupBroadcast = () => {
     const message = `${faker.word.adjective()} ${faker.word.noun()} ${faker.word.verb()}`;
     const notification: GatewayNotification = {
       type: 'broadcast_organization',
@@ -146,78 +143,38 @@ export const Gadget: React.FC<GadgetProps> = ({
   }, [handleSocketConnect, handleSocketDisconnect, handleSocketProgress, socket]);
 
   return (
-    <Card sx={{ width: 345, height: 345, margin: 2 }}>
-      <GadgetHeader
-        userName={client.name}
-        organizationName={`@${organization.name}`}
-        socketOn={socketOn}
-        messagesCount={notifications.length}
-        onMonitorClick={() => setContentToggled(true)}
-        onNotificationClick={() => setContentToggled(false)}
-      />
-
-      <CardContent>
-        <GadgetContentSlider
-          progress={<GadgetProgressGrid gadgetProgressProps={gadgetProgressProps} />}
-          notifications={<GadgetNotifications notifications={notifications} />}
-          contentToggled={contentToggled}
-        ></GadgetContentSlider>
-      </CardContent>
-      <CardActions disableSpacing>
-        <IconButton
-          aria-label="Toggle socket connection"
-          title="Toggle the socket connection"
-          onClick={handleToggleSocket}
-        >
-          {socketOn ? <PowerIcon color="success" /> : <PowerOffIcon color="disabled" />}
-        </IconButton>
-        <IconButton aria-label="Configure jobs" title="Configure jobs" disabled={!dispatchEnabled}>
-          <SettingsIcon />
-        </IconButton>
-        <IconButton
-          aria-label="Dispatch jobs"
-          title="Dispatch jobs"
-          onClick={handleSimulateDispatch}
-          disabled={!dispatchEnabled}
-        >
-          <AddToQueueIcon />
-        </IconButton>
-        <IconButton
-          aria-label={`Add Gadget to ${organization.name}`}
-          title={`Add Gadget to ${organization.name}`}
-          onClick={handleGroupAdd}
-        >
-          <GroupAddIcon />
-        </IconButton>
-        <IconButton
-          aria-label={`Leave ${organization.name}`}
-          title={`Leave ${organization.name}`}
-          onClick={handleGroupLeave}
-          disabled={!isGroup}
-        >
-          <ExitToAppIcon />
-        </IconButton>
-
-        <IconButton
-          aria-label="Broadcast to group"
-          title="Broadcast to group"
-          onClick={handleBroadcast}
-        >
-          <CampaignIcon />
-        </IconButton>
-
-        <IconButton
-          aria-label="Clear notifications"
-          title="Clear notifications"
-          onClick={handleClearNotifications}
-          disabled={notifications.length === 0 || contentToggled}
-        >
-          <MarkChatReadIcon />
-        </IconButton>
-        <IconButton aria-label={`Remove Gadget`} title={`Remove Gadget`} onClick={handleRemove}>
-          <DeleteIcon />
-        </IconButton>
-      </CardActions>
-    </Card>
+    <GadgetProvider
+      value={{
+        socketOn,
+        isGroup,
+        contentToggled,
+        dispatchEnabled,
+        client,
+        organization,
+        gadgetProgressProps,
+        notifications,
+        handleToggleSocket,
+        handleContentToggle,
+        handleSimulateDispatch,
+        handleClearNotifications,
+        handleGroupBroadcast,
+        handleGroupAdd,
+        handleGroupLeave,
+        handleRemove,
+      }}
+    >
+      <Card sx={{ width: 345, height: 345, margin: 2 }}>
+        <GadgetHeader />
+        <CardContent>
+          <GadgetContentSlider
+            progress={<GadgetProgressGrid />}
+            notifications={<GadgetNotifications />}
+          ></GadgetContentSlider>
+        </CardContent>
+        <CardActions disableSpacing>
+          <GadgetActions />
+        </CardActions>
+      </Card>
+    </GadgetProvider>
   );
 };

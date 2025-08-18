@@ -1,19 +1,15 @@
 import MonitorIcon from '@mui/icons-material/Monitor';
 import NotificationIcon from '@mui/icons-material/Notifications';
 import { Badge, Box, CardHeader, IconButton } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
+import { GadgetContext } from '../../providers/GadgetContext';
 import { DiceBearAvatar } from '../DiceBear';
 import { DiceBearVariant } from '../DiceBear/types';
-import { GadgetHeaderProps } from './types';
 
-export const GadgetHeader: React.FC<GadgetHeaderProps> = ({
-  userName,
-  organizationName,
-  socketOn,
-  messagesCount,
-  onMonitorClick,
-  onNotificationClick,
-}) => {
+export const GadgetHeader: React.FC = () => {
+  const { socketOn, client, organization, handleContentToggle, notifications } =
+    useContext(GadgetContext);
+
   return (
     <CardHeader
       avatar={
@@ -24,21 +20,21 @@ export const GadgetHeader: React.FC<GadgetHeaderProps> = ({
             horizontal: 'left',
           }}
         >
-          <DiceBearAvatar seed={userName} />
+          <DiceBearAvatar seed={client.name} />
         </Badge>
       }
-      title={userName}
+      title={client.name}
       subheader={
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {organizationName}
-          <DiceBearAvatar seed={organizationName} size={12} variant={DiceBearVariant.IDENTICON} />
+          {organization.name}
+          <DiceBearAvatar seed={organization.name} size={12} variant={DiceBearVariant.IDENTICON} />
         </Box>
       }
       action={
         <>
           <IconButton
             aria-label="Job progress monitor"
-            onClick={onMonitorClick}
+            onClick={handleContentToggle}
             title="Show job progress monitor"
           >
             <Badge>
@@ -47,10 +43,10 @@ export const GadgetHeader: React.FC<GadgetHeaderProps> = ({
           </IconButton>
           <IconButton
             aria-label="Notifications"
-            onClick={onNotificationClick}
+            onClick={handleContentToggle}
             title="Show notifications"
           >
-            <Badge badgeContent={messagesCount} max={99} color="primary">
+            <Badge badgeContent={notifications.length} max={99} color="primary">
               <NotificationIcon />
             </Badge>
           </IconButton>
