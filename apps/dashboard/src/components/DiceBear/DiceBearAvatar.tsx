@@ -28,9 +28,9 @@ export const DiceBearAvatar: FC<DiceBearProps> = ({
 
   return (
     <Avatar
-      aria-label="avatars"
       variant="square"
       src={getDiceUrl()}
+      alt={seed}
       sx={{ width: size ?? 36, height: size ?? 36 }}
     >
       {getInitials()}

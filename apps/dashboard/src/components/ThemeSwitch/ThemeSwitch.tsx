@@ -2,7 +2,7 @@ import Switch from '@mui/material/Switch';
 import { ThemeSwitchProps } from './types';
 
 export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ checked, handleChange }) => {
-  const label = { inputProps: { 'aria-label': 'Theme switch' } };
+  const slotProps = { input: { 'aria-label': 'Switch between dark and light theme' } };
 
   const sx = {
     position: 'fixed',
@@ -13,7 +13,7 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ checked, handleChange 
 
   return (
     <>
-      <Switch {...label} checked={checked} onChange={handleChange} sx={sx} />
+      <Switch slotProps={slotProps} checked={checked} onChange={handleChange} sx={sx} />
     </>
   );
 };

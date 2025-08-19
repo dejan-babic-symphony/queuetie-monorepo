@@ -9,5 +9,10 @@ const config: StorybookConfig = {
     '@storybook/addon-vitest',
   ],
   framework: { name: '@storybook/react-vite', options: {} },
+  viteFinal: async (config) => {
+    const { default: tsconfigPaths } = await import('vite-tsconfig-paths');
+    config.plugins = [...(config.plugins ?? []), tsconfigPaths()];
+    return config;
+  },
 };
 export default config;

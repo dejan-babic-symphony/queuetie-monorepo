@@ -1,9 +1,9 @@
+import { Container } from '@mui/material';
 import React from 'react';
 import './App.css';
-import { Container } from '@mui/material';
 import { EmptyDashboard } from './components/EmptyDashboard';
-import { GadgetSpeedDial } from './components/GadgetSpeedDial';
 import { GadgetGrid } from './components/Gadget';
+import { GadgetSpeedDial } from './components/GadgetSpeedDial';
 import { useGadgets } from './hooks/useGadgets';
 export const App: React.FC = () => {
   const { gadgets, hasGadgets, addGadget, clearGadgets, setGadgets } = useGadgets();
@@ -16,7 +16,7 @@ export const App: React.FC = () => {
         showClearButton={hasGadgets}
         onClearGadgets={clearGadgets}
       />
-      <EmptyDashboard show={!hasGadgets} />
+      {!hasGadgets && <EmptyDashboard />}
     </Container>
   );
 };
