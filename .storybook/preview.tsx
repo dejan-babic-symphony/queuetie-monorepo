@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/react-vite';
 import { Root } from '../apps/dashboard/src/components/Root';
+import React from 'react';
 
 const preview: Preview = {
   parameters: {
