@@ -5,6 +5,9 @@ type Story = StoryObj<typeof ThemeSwitch>;
 
 const meta: Meta<typeof ThemeSwitch> = {
   component: ThemeSwitch,
+  parameters: {
+    layout: 'centered',
+  },
   title: 'basic/ThemeSwitch',
   tags: ['theme', 'atoms'],
 };
