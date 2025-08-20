@@ -26,8 +26,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/queuetie-monorepo/test/jest-e2e.json",
-    "test:storybook": "test-storybook",
-    "test:storybook:dev": "start-server-and-test storybook http://127.0.0.1:6006 test:storybook",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -84,7 +82,6 @@
     "@storybook/addon-docs": "^9.1.2",
     "@storybook/addon-vitest": "^9.1.2",
     "@storybook/react-vite": "^9.1.2",
-    "@storybook/test-runner": "^0.23.0",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
     "@testing-library/jest-dom": "^6.6.3",
