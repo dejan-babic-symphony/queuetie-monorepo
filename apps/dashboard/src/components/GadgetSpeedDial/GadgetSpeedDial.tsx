@@ -1,15 +1,15 @@
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import { GadgetSpeedDialProps } from './types';
 
 export const GadgetSpeedDial: React.FC<GadgetSpeedDialProps> = ({
-  showClearButton: hasGadgets = false,
+  showClearButton,
   onAddGadget,
   onClearGadgets,
 }) => {
-  const ariaLabel = 'SpeedDial for simulation control';
+  const ariaLabel = 'Speed dial for gadget control';
   const sx = {
     position: 'fixed',
     bottom: 16,
@@ -26,7 +26,7 @@ export const GadgetSpeedDial: React.FC<GadgetSpeedDialProps> = ({
           title="Add Gadget"
           onClick={onAddGadget}
         />
-        {hasGadgets && (
+        {showClearButton && (
           <SpeedDialAction
             key={'clear'}
             icon={<DeleteSweepIcon />}
