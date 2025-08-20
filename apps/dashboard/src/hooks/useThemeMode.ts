@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
 import { createTheme, Theme } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 
 export const useThemeMode = () => {
   const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;

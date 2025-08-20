@@ -28,8 +28,13 @@ export const Default: Story = {
     const addButton = await canvas.findByLabelText('Add Gadget');
     const clearButton = canvas.queryByLabelText('Clear Gadgets');
 
-    await waitFor(() => expect(addButton).toBeVisible(), { timeout: 200 });
-    await waitFor(() => expect(clearButton).toBeNull(), { timeout: 200 });
+    await waitFor(
+      () => {
+        expect(addButton).toBeVisible();
+        expect(clearButton).toBeNull();
+      },
+      { timeout: 100 }
+    );
 
     await userEvent.click(addButton);
 
@@ -37,7 +42,7 @@ export const Default: Story = {
   },
 };
 
-export const WithGadgetRemove = {
+export const WithClearGadgets = {
   args: { showClearButton: true },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -48,8 +53,13 @@ export const WithGadgetRemove = {
 
     await userEvent.hover(dial);
 
-    await waitFor(() => expect(addButton).toBeVisible(), { timeout: 200 });
-    await waitFor(() => expect(clearButton).toBeVisible(), { timeout: 200 });
+    await waitFor(
+      () => {
+        expect(addButton).toBeVisible();
+        expect(clearButton).toBeVisible();
+      },
+      { timeout: 100 }
+    );
 
     await userEvent.click(clearButton);
 

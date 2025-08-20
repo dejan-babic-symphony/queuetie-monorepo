@@ -1,21 +1,22 @@
-import { StrictMode } from 'react';
-import './Root.css';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import { useThemeMode } from '../../hooks/useThemeMode';
-import { RootProps } from './types';
-import { ThemeSwitch } from '../ThemeSwitch';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StrictMode, useMemo } from 'react';
+import { useThemeMode } from '../../hooks/useThemeMode';
+import { ThemeSwitch } from '../ThemeSwitch';
+import './Root.css';
+import { RootProps } from './types';
 
 export const Root: React.FC<RootProps> = ({ children, withThemeSwitch = false }) => {
-  const { mode, theme, setMode } = useThemeMode();
+  const { mode, theme, toggleTheme } = useThemeMode();
+  const queryClient = useMemo(() => new QueryClient(), []);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMode(event.target.checked ? 'dark' : 'light');
+  const handleChange = () => {
+    toggleTheme();
   };
 
   return (
     <StrictMode>
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           {withThemeSwitch && <ThemeSwitch checked={mode === 'dark'} handleChange={handleChange} />}

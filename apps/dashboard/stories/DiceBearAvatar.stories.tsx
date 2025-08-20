@@ -10,6 +10,7 @@ const meta: Meta<typeof DiceBearAvatar> = {
   title: 'basic/DiceBearAvatar',
   tags: ['avatar', 'atoms', 'test'],
   parameters: {
+    layout: 'centered',
     controls: { expanded: true },
   },
   argTypes: {
