@@ -1,16 +1,19 @@
 import storybookTest from '@storybook/addon-vitest/vitest-plugin';
 import react from '@vitejs/plugin-react';
-import path, { resolve } from 'node:path';
+import { resolve } from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
-const rootDir = fileURLToPath(new URL('.', import.meta.url));
+// @ts-expect-error import.meta.url requires ES2020+ module target
+const __filename = fileURLToPath(import.meta.url);
+const rootDir = dirname(__filename);
 const monorepoRoot = resolve(rootDir, '../..');
 
 export default defineConfig({
   root: rootDir,
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react(), tsconfigPaths()] as any,
   test: {
     projects: [
       {
@@ -20,7 +23,6 @@ export default defineConfig({
           globals: true,
           environment: 'jsdom',
           include: ['src/**/*.{test,spec}.{ts,tsx}'],
-          passWithNoTests: true,
           setupFiles: [
             resolve(monorepoRoot, '.storybook/vitest.setup.ts'),
             resolve(rootDir, 'vitest.setup.ts'),
@@ -29,7 +31,7 @@ export default defineConfig({
       },
       {
         extends: true,
-        plugins: [storybookTest({ configDir: path.join(monorepoRoot, '.storybook') })],
+        plugins: [storybookTest()] as any,
         test: {
           name: 'storybook',
           browser: {
