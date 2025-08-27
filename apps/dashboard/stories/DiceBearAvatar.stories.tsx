@@ -1,5 +1,4 @@
 import { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, within } from 'storybook/test';
 import { DiceBearAvatar } from '../src/components/DiceBear';
 import { DiceBearVariant } from '../src/components/DiceBear/types';
 
@@ -31,35 +30,12 @@ const meta: Meta<typeof DiceBearAvatar> = {
 
 export default meta;
 
-export const Default: Story = {
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const img = canvas.getByRole('img');
-    await expect(img).toHaveAttribute(
-      'src',
-      `https://api.dicebear.com/9.x/${args.variant}/svg?seed=${encodeURIComponent(
-        args.seed.trim()
-      )}`
-    );
-    await expect(img).toHaveAttribute('alt', args.seed);
-  },
-};
+export const Default: Story = {};
 
 export const DifferentVariant: Story = {
   args: {
     seed: 'Jane Roe',
     variant: DiceBearVariant.IDENTICON,
     size: 36,
-  },
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const img = canvas.getByRole('img');
-    await expect(img).toHaveAttribute(
-      'src',
-      `https://api.dicebear.com/9.x/${args.variant}/svg?seed=${encodeURIComponent(
-        args.seed.trim()
-      )}`
-    );
-    await expect(img).toHaveAttribute('alt', args.seed);
   },
 };

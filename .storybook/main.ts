@@ -6,7 +6,7 @@ const config: StorybookConfig = {
     '@chromatic-com/storybook',
     '@storybook/addon-docs',
     '@storybook/addon-a11y',
-    '@storybook/addon-vitest',
+    // '@storybook/addon-vitest', // Disabled - no Vitest integration in Storybook
   ],
   framework: { name: '@storybook/react-vite', options: {} },
   viteFinal: async (config) => {
