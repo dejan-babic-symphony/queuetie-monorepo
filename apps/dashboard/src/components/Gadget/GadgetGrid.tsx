@@ -57,7 +57,7 @@ export const GadgetGrid: React.FC<GadgetGridProps> = ({ gadgets, show, onReorder
                 {gadgets.map((gadget) => (
                   <Grow key={gadget.id} in={gadget.isVisible} timeout={500}>
                     <Grid>
-                      <SortableItem id={gadget.id}>
+                      <SortableItem key={gadget.id} id={gadget.id}>
                         <Gadget {...gadget} />
                       </SortableItem>
                     </Grid>
