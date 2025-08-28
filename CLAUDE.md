@@ -1,0 +1,1 @@
+- Don't write tests for framework or vendor functionalities per say. Focus on new functionality brought by the component or service

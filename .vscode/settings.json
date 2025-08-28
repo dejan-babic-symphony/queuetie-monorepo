@@ -18,5 +18,6 @@
     "*.ts": "typescript"
   },
   "typescript.validate.enable": true,
-  "javascript.validate.enable": true
+  "javascript.validate.enable": true,
+  "cSpell.words": ["unhover"]
 }
