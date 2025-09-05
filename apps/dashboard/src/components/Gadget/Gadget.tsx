@@ -7,9 +7,8 @@ import {
   SimulateRequestType,
 } from '@queuetie/types';
 import { UUID } from 'crypto';
-import { useCallback, useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { useGadgetControl } from '../../hooks/useGadgetControl';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useProgressControl } from '../../hooks/useProgressControl';
 import { useSocket } from '../../hooks/useSocket';
 import { GadgetProvider } from '../../providers/GadgetProvider';
 import { useBroadcastMutation, useDispatchSimulateMutation } from '../../queries/dispatcher';
@@ -31,13 +30,12 @@ export const Gadget: React.FC<GadgetProps> = ({
   const [socketOn, setSocketOn] = useState<boolean>(false);
   const [contentToggled, setContentToggled] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<GatewayNotification[]>([]);
-  const { register, available, associate, update } = useGadgetControl();
+  const { register, available, reserve, update, controls: progressControls } = useProgressControl();
   const { mutate: dispatchSimulate } = useDispatchSimulateMutation();
   const { mutate: broadcast } = useBroadcastMutation();
 
   // Derived values
   const dispatchEnabled = !!(available.length && socketOn);
-  const gadgetProgressProps = Array.from({ length: 3 }).map(() => register());
 
   // Socket connection handlers
   const handleSocketConnect = useCallback(() => {
@@ -79,18 +77,22 @@ export const Gadget: React.FC<GadgetProps> = ({
   const handleSocketProgress = useCallback(
     (progress: GatewayProgress) => {
       const { dispatchedJobs, completed, context } = progress;
-      update(context, (completed * 100) / dispatchedJobs);
+      const calculatedProgress = (completed * 100) / dispatchedJobs;
+
+      update(context, calculatedProgress);
+
+      if (calculatedProgress == 100) {
+        setTimeout(() => update(context, 0), 2000);
+      }
     },
     [update]
   );
 
   // Job dispatching handlers
   const handleSimulateDispatch = () => {
-    const id = available.reverse().slice(-1)[0];
-    const context = uuidv4();
+    const id = available[0];
 
-    associate(id, context);
-    update(id, 0);
+    reserve(id);
 
     const payload: SimulateRequestType = {
       type: 'single',
@@ -98,12 +100,14 @@ export const Gadget: React.FC<GadgetProps> = ({
       delay: 10,
       echo: {
         total: Math.floor(Math.random() * 50) + 1,
-        context,
+        context: id,
+        batch: `${Date.now()}`,
         client,
         organization,
       },
     };
-    dispatchSimulate(payload);
+
+    setTimeout(() => dispatchSimulate(payload), 1000);
   };
 
   // Broadcasting handlers
@@ -124,6 +128,15 @@ export const Gadget: React.FC<GadgetProps> = ({
 
     broadcast({ socket, broadcast: broadcastPayload });
   };
+
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (!initialized.current) {
+      Array.from({ length: 3 }, () => register());
+      initialized.current = true;
+    }
+  }, [register]);
   useEffect(() => {
     if (socket) {
       socket.on('connect', handleSocketConnect);
@@ -151,7 +164,7 @@ export const Gadget: React.FC<GadgetProps> = ({
         dispatchEnabled,
         client,
         organization,
-        gadgetProgressProps,
+        progressControls,
         notifications,
         handleToggleSocket,
         handleContentToggle,

@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import { GadgetNotifications } from './GadgetNotifications';
 import { GadgetProgressGrid } from './GadgetProgressGrid';
+import { ProgressControl } from '../../hooks/useProgressControl';
 
 export type GadgetGridProps = {
   show: boolean;
@@ -30,11 +31,7 @@ export enum GadgetProgressStatus {
   Done,
 }
 
-export type GadgetProgressProps = {
-  id: string;
-  progress: number;
-  status: GadgetProgressStatus;
-};
+export type GadgetProgressProps = ProgressControl;
 
 export type GadgetContentSliderProps = {
   notifications: ReactElement<typeof GadgetNotifications>;

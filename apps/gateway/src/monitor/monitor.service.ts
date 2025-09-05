@@ -27,9 +27,12 @@ export class MonitorService extends QueueEventsHost {
       return;
     }
 
-    const { context, total, client } = job.data;
+    const { context, total, client, batch } = job.data;
 
-    const wasSet = await this.redis.setIfNotExists(`${context}-dispatching`, total);
+    const wasSet = await this.redis.setIfNotExists(
+      `queuetie:simulate:${context}:${batch}:dispatched`,
+      total
+    );
 
     if (wasSet) {
       this.eventService.emitJobsDispatchingEvent({ clientId: client.id, dispatchedJobs: total });
@@ -45,9 +48,9 @@ export class MonitorService extends QueueEventsHost {
       return;
     }
 
-    const { context, total, client } = job.data;
+    const { context, total, client, batch } = job.data;
 
-    const completed = await this.redis.increment(`${context}-completed`);
+    const completed = await this.redis.increment(`queuetie:simulate:${context}:${batch}:completed`);
 
     const payload = {
       clientId: client.id,

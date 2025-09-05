@@ -11,6 +11,7 @@ export type SimulateOrganization = {
 export type SimulateEcho = {
   total: number;
   context: string;
+  batch: string;
   client: SimulateClient;
   organization: SimulateOrganization;
 };

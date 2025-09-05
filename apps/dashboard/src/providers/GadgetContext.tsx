@@ -1,6 +1,6 @@
 import { GatewayNotification, SimulateClient, SimulateOrganization } from '@queuetie/types';
 import { createContext } from 'react';
-import { GadgetProgressProps } from '../components/Gadget/types';
+import { ProgressControl } from '../hooks/useProgressControl';
 
 export type GadgetContextType = {
   socketOn: boolean;
@@ -9,7 +9,7 @@ export type GadgetContextType = {
   dispatchEnabled: boolean;
   client: SimulateClient | null;
   organization: SimulateOrganization | null;
-  gadgetProgressProps: GadgetProgressProps[];
+  progressControls: Record<string, ProgressControl>;
   notifications: GatewayNotification[];
   handleToggleSocket: () => void;
   handleContentToggle: () => void;
@@ -28,7 +28,7 @@ export const GadgetContext = createContext<GadgetContextType>({
   dispatchEnabled: false,
   client: null,
   organization: null,
-  gadgetProgressProps: [],
+  progressControls: {},
   notifications: [],
   handleToggleSocket: () => {},
   handleContentToggle: () => {},

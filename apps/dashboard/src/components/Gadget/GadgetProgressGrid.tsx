@@ -1,10 +1,15 @@
 import { Stack } from '@mui/material';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import { ProgressControl } from '../../hooks/useProgressControl';
 import { GadgetContext } from '../../providers/GadgetContext';
 import { GadgetProgress } from './GadgetProgress';
 
 export const GadgetProgressGrid: React.FC = () => {
-  const { gadgetProgressProps } = useContext(GadgetContext);
+  const { progressControls } = useContext(GadgetContext);
+
+  const controlsList = Object.values(progressControls);
+
+  useEffect(() => {}, [progressControls]);
 
   return (
     <Stack
@@ -12,8 +17,8 @@ export const GadgetProgressGrid: React.FC = () => {
       spacing={3}
       sx={{ alignItems: 'center ', justifyContent: 'center', my: 4 }}
     >
-      {gadgetProgressProps.map((props) => {
-        return <GadgetProgress key={props.id} {...props} />;
+      {controlsList.map((control: ProgressControl) => {
+        return <GadgetProgress key={control.id} {...control} />;
       })}
     </Stack>
   );

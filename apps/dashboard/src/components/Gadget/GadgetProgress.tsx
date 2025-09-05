@@ -1,17 +1,17 @@
-import React from 'react';
-import { GadgetProgressProps, GadgetProgressStatus } from './types';
 import { Box, CircularProgress, Paper, Typography } from '@mui/material';
+import React from 'react';
+import { ProgressControl, ProgressStatus } from '../../hooks/useProgressControl';
 
-export const GadgetProgress: React.FC<GadgetProgressProps> = ({ progress, status }) => {
-  const isIdle = status === GadgetProgressStatus.Idle;
+export const GadgetProgress: React.FC<ProgressControl> = ({ progress, status }) => {
+  const isIdle = status === ProgressStatus.Idle;
   const calculatedProgress = Math.round(isIdle ? 100 : Math.max(Math.min(progress, 100), 0));
   const displayProgress = isIdle ? '0%' : `${calculatedProgress}%`;
 
-  const statusToColorMap: Map<GadgetProgressStatus, 'primary.main' | 'success.main' | '#BDBDBD'> =
+  const statusToColorMap: Map<ProgressStatus, 'primary.main' | 'success.main' | '#BDBDBD'> =
     new Map([
-      [GadgetProgressStatus.Idle, '#BDBDBD'],
-      [GadgetProgressStatus.Active, 'primary.main'],
-      [GadgetProgressStatus.Done, 'success.main'],
+      [ProgressStatus.Idle, '#BDBDBD'],
+      [ProgressStatus.Active, 'primary.main'],
+      [ProgressStatus.Done, 'success.main'],
     ]);
 
   return (
@@ -19,9 +19,7 @@ export const GadgetProgress: React.FC<GadgetProgressProps> = ({ progress, status
       <Box
         sx={{
           position: 'relative',
-          display: 'inline-flex',
-          border: 'InfoBackground',
-          alignContent: 'center',
+          display: 'flex',
         }}
       >
         <CircularProgress

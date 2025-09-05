@@ -78,6 +78,14 @@ export class Echo implements SimulateEcho {
   context: UUID;
 
   @ApiProperty({
+    description: 'Batch identifier for grouping related jobs',
+    default: 'batch-1693824000000',
+  })
+  @IsString()
+  @IsNotEmpty()
+  batch: string;
+
+  @ApiProperty({
     description: 'User details used for emitting messages',
     type: User,
   })
