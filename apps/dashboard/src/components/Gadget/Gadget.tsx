@@ -30,7 +30,14 @@ export const Gadget: React.FC<GadgetProps> = ({
   const [socketOn, setSocketOn] = useState<boolean>(false);
   const [contentToggled, setContentToggled] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<GatewayNotification[]>([]);
-  const { register, available, reserve, update, controls: progressControls } = useProgressControl();
+  const {
+    register,
+    available,
+    reserve,
+    update,
+    reset,
+    controls: progressControls,
+  } = useProgressControl();
   const { mutate: dispatchSimulate } = useDispatchSimulateMutation();
   const { mutate: broadcast } = useBroadcastMutation();
 
@@ -82,10 +89,10 @@ export const Gadget: React.FC<GadgetProps> = ({
       update(context, calculatedProgress);
 
       if (calculatedProgress == 100) {
-        setTimeout(() => update(context, 0), 2000);
+        setTimeout(() => reset(context), 2000);
       }
     },
-    [update]
+    [update, reset]
   );
 
   // Job dispatching handlers
