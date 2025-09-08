@@ -1,2 +1,3 @@
 npm test
+npm run test:dashboard
 npx pretty-quick --staged
