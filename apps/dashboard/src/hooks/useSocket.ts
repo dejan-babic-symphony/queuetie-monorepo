@@ -1,16 +1,17 @@
 import { SimulateClient, SimulateOrganization } from '@queuetie/types';
+import { dashboardConfig } from '../config/dashboard';
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 export const useSocket = (client: SimulateClient, organization: SimulateOrganization) => {
   const [socket, setSocket] = useState<Socket | undefined>(undefined);
 
-  const token = 'let-me-in';
+  const config = dashboardConfig();
 
   useEffect(() => {
-    const socket = io('localhost:3000', {
+    const socket = io(config.socket.url as string, {
       extraHeaders: {
-        token: token,
+        token: config.socket.token,
         clientId: client.id,
         clientName: client.name,
         organizationId: organization.id,
@@ -25,7 +26,7 @@ export const useSocket = (client: SimulateClient, organization: SimulateOrganiza
         socket.disconnect();
       }
     };
-  }, [token, client, organization]);
+  }, [config.socket.url, config.socket.token, client, organization]);
 
   return { socket };
 };

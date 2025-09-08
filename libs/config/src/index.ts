@@ -11,6 +11,8 @@ type EnvSchema = {
   GATEWAY_SOCKET_CHANNEL_BROADCAST: string;
   GATEWAY_SOCKET_CHANNEL_NOTIFICATION: string;
   GATEWAY_SOCKET_CHANNEL_PROGRESS: string;
+  VITE_SOCKET_URL: string;
+  VITE_SOCKET_TOKEN: string;
 };
 
 declare global {

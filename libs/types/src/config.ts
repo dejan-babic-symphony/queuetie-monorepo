@@ -19,3 +19,10 @@ export type QueueConfig = {
   firstQueue: string;
   secondQueue: string;
 };
+
+export type DashboardConfig = {
+  socket: {
+    url: string;
+    token: string;
+  };
+};
