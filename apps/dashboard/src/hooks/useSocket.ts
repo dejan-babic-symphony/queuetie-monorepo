@@ -1,15 +1,15 @@
 import { SimulateClient, SimulateOrganization } from '@queuetie/types';
 import { dashboardConfig } from '../config/dashboard';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 export const useSocket = (client: SimulateClient, organization: SimulateOrganization) => {
   const [socket, setSocket] = useState<Socket | undefined>(undefined);
 
-  const config = dashboardConfig();
+  const config = useMemo(() => dashboardConfig(), []);
 
   useEffect(() => {
-    const socket = io(config.socket.url as string, {
+    const socket = io(config.socket.url, {
       extraHeaders: {
         token: config.socket.token,
         clientId: client.id,
