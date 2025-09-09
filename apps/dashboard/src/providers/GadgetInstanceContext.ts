@@ -2,7 +2,7 @@ import { GatewayNotification, SimulateClient, SimulateOrganization } from '@queu
 import { createContext } from 'react';
 import { ProgressControl } from '../hooks/useProgressControl';
 
-export type GadgetContextType = {
+export type GadgetInstanceContextType = {
   socketOn: boolean;
   isGroup: boolean;
   contentToggled: boolean;
@@ -21,7 +21,7 @@ export type GadgetContextType = {
   handleRemove: () => void;
 };
 
-export const GadgetContext = createContext<GadgetContextType>({
+export const GadgetInstanceContext = createContext<GadgetInstanceContextType>({
   socketOn: false,
   isGroup: false,
   contentToggled: false,

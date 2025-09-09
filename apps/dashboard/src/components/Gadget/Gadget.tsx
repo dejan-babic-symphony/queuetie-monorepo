@@ -8,9 +8,10 @@ import {
 } from '@queuetie/types';
 import { UUID } from 'crypto';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGadgetActions } from '../../hooks/useGadgetState';
 import { useProgressControl } from '../../hooks/useProgressControl';
 import { useSocket } from '../../hooks/useSocket';
-import { GadgetProvider } from '../../providers/GadgetProvider';
+import { GadgetProvider } from '../../providers';
 import { useBroadcastMutation, useDispatchSimulateMutation } from '../../queries/dispatcher';
 import { GadgetActions } from './GadgetActions';
 import { GadgetContentSlider } from './GadgetContentSlider';
@@ -18,15 +19,13 @@ import { GadgetHeader } from './GadgetHeader';
 import { GadgetNotifications } from './GadgetNotifications';
 import { GadgetProgressGrid } from './GadgetProgressGrid';
 import { GadgetProps } from './types';
-export const Gadget: React.FC<GadgetProps> = ({
-  client,
-  organization,
-  isGroup,
-  onGroup: handleGroupAdd,
-  onGroupLeave: handleGroupLeave,
-  onRemove: handleRemove,
-}) => {
+export const Gadget: React.FC<GadgetProps> = ({ id, client, organization, isGroup }) => {
   const { socket } = useSocket(client, organization);
+  const {
+    onGroup: handleGroupAdd,
+    onGroupLeave: handleGroupLeave,
+    onRemove: handleRemove,
+  } = useGadgetActions(id);
   const [socketOn, setSocketOn] = useState<boolean>(false);
   const [contentToggled, setContentToggled] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<GatewayNotification[]>([]);

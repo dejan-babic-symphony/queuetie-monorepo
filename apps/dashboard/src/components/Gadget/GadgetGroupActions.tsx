@@ -1,10 +1,10 @@
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { Box, IconButton } from '@mui/material';
-import { FC, useContext } from 'react';
-import { GadgetContext } from '../../providers/GadgetContext';
+import { FC } from 'react';
+import { useGadgetInstance } from '../../providers';
 export const GadgetGroupActions: FC = () => {
-  const gadget = useContext(GadgetContext);
+  const gadget = useGadgetInstance();
 
   return (
     <Box>

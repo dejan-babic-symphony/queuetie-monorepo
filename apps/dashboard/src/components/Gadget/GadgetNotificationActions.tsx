@@ -2,11 +2,11 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import MarkChatReadIcon from '@mui/icons-material/MarkChatRead';
 import MessageIcon from '@mui/icons-material/Message';
 import { Box, IconButton } from '@mui/material';
-import { FC, useContext } from 'react';
-import { GadgetContext } from '../../providers/GadgetContext';
+import { FC } from 'react';
+import { useGadgetInstance } from '../../providers';
 
 export const GadgetNotificationActions: FC = () => {
-  const gadget = useContext(GadgetContext);
+  const gadget = useGadgetInstance();
   return (
     <Box>
       <IconButton

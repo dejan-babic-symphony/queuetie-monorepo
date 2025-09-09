@@ -1,14 +1,14 @@
 import MonitorIcon from '@mui/icons-material/Monitor';
 import NotificationIcon from '@mui/icons-material/Notifications';
 import { Badge, Box, CardHeader, IconButton } from '@mui/material';
-import React, { useContext } from 'react';
-import { GadgetContext } from '../../providers/GadgetContext';
+import React from 'react';
+import { useGadgetInstance } from '../../providers';
 import { DiceBearAvatar } from '../DiceBear';
 import { DiceBearVariant } from '../DiceBear/types';
 
 export const GadgetHeader: React.FC = () => {
   const { socketOn, client, organization, handleContentToggle, notifications } =
-    useContext(GadgetContext);
+    useGadgetInstance();
 
   return (
     <CardHeader

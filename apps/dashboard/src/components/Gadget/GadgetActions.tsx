@@ -2,14 +2,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PowerIcon from '@mui/icons-material/Power';
 import PowerOffIcon from '@mui/icons-material/PowerOff';
 import { Box, Divider, IconButton } from '@mui/material';
-import { FC, useContext } from 'react';
-import { GadgetContext } from '../../providers/GadgetContext';
+import { FC } from 'react';
+import { useGadgetInstance } from '../../providers';
 import { GadgetGroupActions } from './GadgetGroupActions';
 import { GadgetJobActions } from './GadgetJobActions';
 import { GadgetNotificationActions } from './GadgetNotificationActions';
 
 export const GadgetActions: FC = () => {
-  const { socketOn, contentToggled, handleToggleSocket, handleRemove } = useContext(GadgetContext);
+  const { socketOn, contentToggled, handleToggleSocket, handleRemove } = useGadgetInstance();
 
   return (
     <>

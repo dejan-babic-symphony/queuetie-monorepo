@@ -2,6 +2,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode, useMemo } from 'react';
 import { useThemeMode } from '../../hooks/useThemeMode';
+import { GadgetStateProvider } from '../../providers/GadgetStateProvider';
 import { ThemeSwitch } from '../ThemeSwitch';
 import './Root.css';
 import { RootProps } from './types';
@@ -19,8 +20,12 @@ export const Root: React.FC<RootProps> = ({ children, withThemeSwitch = false })
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          {withThemeSwitch && <ThemeSwitch checked={mode === 'dark'} handleChange={handleChange} />}
-          {children}
+          <GadgetStateProvider>
+            {withThemeSwitch && (
+              <ThemeSwitch checked={mode === 'dark'} handleChange={handleChange} />
+            )}
+            {children}
+          </GadgetStateProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>

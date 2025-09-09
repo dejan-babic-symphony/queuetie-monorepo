@@ -20,9 +20,6 @@ export type GadgetProps = {
   isGroup: boolean;
   client: GadgetEntity;
   organization: GadgetEntity;
-  onGroup: () => void;
-  onGroupLeave: () => void;
-  onRemove: () => void;
 };
 
 export enum GadgetProgressStatus {

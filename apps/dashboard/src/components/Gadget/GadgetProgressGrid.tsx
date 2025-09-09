@@ -1,11 +1,11 @@
 import { Stack } from '@mui/material';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ProgressControl } from '../../hooks/useProgressControl';
-import { GadgetContext } from '../../providers/GadgetContext';
+import { useGadgetInstance } from '../../providers';
 import { GadgetProgress } from './GadgetProgress';
 
 export const GadgetProgressGrid: React.FC = () => {
-  const { progressControls } = useContext(GadgetContext);
+  const { progressControls } = useGadgetInstance();
 
   const controlsList = Object.values(progressControls);
 

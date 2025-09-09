@@ -4,9 +4,10 @@ import './App.css';
 import { EmptyDashboard } from './components/EmptyDashboard';
 import { GadgetGrid } from './components/Gadget';
 import { GadgetSpeedDial } from './components/GadgetSpeedDial';
-import { useGadgets } from './hooks/useGadgets';
+import { useGadgetState } from './hooks/useGadgetState';
+
 export const App: React.FC = () => {
-  const { gadgets, hasGadgets, addGadget, clearGadgets, setGadgets } = useGadgets();
+  const { gadgets, hasGadgets, addGadget, clearGadgets, setGadgets } = useGadgetState();
 
   return (
     <Container disableGutters>

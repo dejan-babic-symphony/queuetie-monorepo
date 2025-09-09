@@ -2,10 +2,10 @@ import AddToQueueIcon from '@mui/icons-material/AddToQueue';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SyncIcon from '@mui/icons-material/Sync';
 import { Box, IconButton } from '@mui/material';
-import { FC, useContext } from 'react';
-import { GadgetContext } from '../../providers/GadgetContext';
+import { FC } from 'react';
+import { useGadgetInstance } from '../../providers';
 export const GadgetJobActions: FC = () => {
-  const gadget = useContext(GadgetContext);
+  const gadget = useGadgetInstance();
 
   return (
     <Box>
