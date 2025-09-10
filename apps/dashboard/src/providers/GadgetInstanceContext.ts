@@ -21,21 +21,4 @@ export type GadgetInstanceContextType = {
   handleRemove: () => void;
 };
 
-export const GadgetInstanceContext = createContext<GadgetInstanceContextType>({
-  socketOn: false,
-  isGroup: false,
-  contentToggled: false,
-  dispatchEnabled: false,
-  client: null,
-  organization: null,
-  progressControls: {},
-  notifications: [],
-  handleToggleSocket: () => {},
-  handleContentToggle: () => {},
-  handleSimulateDispatch: () => {},
-  handleClearNotifications: () => {},
-  handleGroupBroadcast: () => {},
-  handleGroupAdd: () => {},
-  handleGroupLeave: () => {},
-  handleRemove: () => {},
-});
+export const GadgetInstanceContext = createContext<GadgetInstanceContextType | null>(null);
