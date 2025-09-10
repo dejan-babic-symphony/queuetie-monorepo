@@ -21,8 +21,7 @@ export const GadgetActions: FC = () => {
         {socketOn ? <PowerIcon color="success" /> : <PowerOffIcon color="disabled" />}
       </IconButton>
       <Divider variant="middle" orientation="vertical" flexItem />
-      {contentToggled && <GadgetJobActions />}
-      {!contentToggled && <GadgetNotificationActions />}
+      {contentToggled ? <GadgetJobActions /> : <GadgetNotificationActions />}
       <Divider variant="middle" orientation="vertical" flexItem />
       <GadgetGroupActions />
       <Box sx={{ flexGrow: 1 }} />

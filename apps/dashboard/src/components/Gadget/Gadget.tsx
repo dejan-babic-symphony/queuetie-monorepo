@@ -9,6 +9,7 @@ import {
 import { UUID } from 'crypto';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGadgetActions } from '../../hooks/useGadgetState';
+import { useGadgetAnimations } from '../../hooks/useGadgetAnimations';
 import { useProgressControl } from '../../hooks/useProgressControl';
 import { useSocket } from '../../hooks/useSocket';
 import { GadgetProvider } from '../../providers';
@@ -22,10 +23,11 @@ import { GadgetProps } from './types';
 export const Gadget: React.FC<GadgetProps> = ({ id, client, organization, isGroup }) => {
   const { socket } = useSocket(client, organization);
   const {
-    onGroup: handleGroupAdd,
-    onGroupLeave: handleGroupLeave,
-    onRemove: handleRemove,
+    groupGadget: handleGroupAdd,
+    leaveGroup: handleGroupLeave,
+    removeGadget,
   } = useGadgetActions(id);
+  const { removeGadgetAnimated } = useGadgetAnimations();
   const [socketOn, setSocketOn] = useState<boolean>(false);
   const [contentToggled, setContentToggled] = useState<boolean>(true);
   const [notifications, setNotifications] = useState<GatewayNotification[]>([]);
@@ -133,6 +135,11 @@ export const Gadget: React.FC<GadgetProps> = ({ id, client, organization, isGrou
     };
 
     broadcast({ socket, broadcast: broadcastPayload });
+  };
+
+  // UX animation handlers
+  const handleRemove = () => {
+    removeGadgetAnimated(id, removeGadget);
   };
 
   const initialized = useRef(false);
