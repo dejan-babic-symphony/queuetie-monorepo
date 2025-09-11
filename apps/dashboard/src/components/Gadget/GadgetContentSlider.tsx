@@ -4,7 +4,7 @@ import { useGadgetInstance } from '../../providers';
 import { GadgetContentSliderProps } from './types';
 
 export const GadgetContentSlider: FC<GadgetContentSliderProps> = ({ notifications, progress }) => {
-  const { contentToggled } = useGadgetInstance();
+  const { activeContent } = useGadgetInstance();
   const contentRef = useRef<HTMLElement>(null);
 
   const contentContainerSx: CSSProperties = {
@@ -17,18 +17,42 @@ export const GadgetContentSlider: FC<GadgetContentSliderProps> = ({ notification
     justifyContent: 'center',
   };
 
+  const getSlideDirection = () => {
+    switch (activeContent) {
+      case 'progress':
+        return 'right';
+      case 'notifications':
+        return 'left';
+      default:
+        return 'down';
+    }
+  };
+
+  const renderContent = () => {
+    switch (activeContent) {
+      case 'progress':
+        return progress;
+      case 'notifications':
+        return notifications;
+      case 'none':
+        return <Box>No content selected</Box>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Box ref={contentRef}>
       <Slide
-        key={contentToggled ? 'progress' : 'notifications'} // forces remount
+        key={activeContent} // forces remount when content type changes
         container={() => contentRef.current ?? undefined}
-        direction={contentToggled ? 'right' : 'left'}
-        in
+        direction={getSlideDirection()}
+        in={activeContent !== 'none'}
         timeout={500}
         mountOnEnter
         unmountOnExit
       >
-        <Box sx={contentContainerSx}>{contentToggled ? progress : notifications}</Box>
+        <Box sx={contentContainerSx}>{renderContent()}</Box>
       </Slide>
     </Box>
   );

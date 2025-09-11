@@ -9,7 +9,19 @@ import { GadgetJobActions } from './GadgetJobActions';
 import { GadgetNotificationActions } from './GadgetNotificationActions';
 
 export const GadgetActions: FC = () => {
-  const { socketOn, contentToggled, handleToggleSocket, handleRemove } = useGadgetInstance();
+  const { socketOn, activeContent, handleToggleSocket, handleRemove } = useGadgetInstance();
+
+  const renderContentActions = () => {
+    switch (activeContent) {
+      case 'progress':
+        return <GadgetJobActions />;
+      case 'notifications':
+        return <GadgetNotificationActions />;
+      case 'none':
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -21,7 +33,7 @@ export const GadgetActions: FC = () => {
         {socketOn ? <PowerIcon color="success" /> : <PowerOffIcon color="disabled" />}
       </IconButton>
       <Divider variant="middle" orientation="vertical" flexItem />
-      {contentToggled ? <GadgetJobActions /> : <GadgetNotificationActions />}
+      {renderContentActions()}
       <Divider variant="middle" orientation="vertical" flexItem />
       <GadgetGroupActions />
       <Box sx={{ flexGrow: 1 }} />

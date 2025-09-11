@@ -13,6 +13,7 @@ import { useGadgetAnimations } from '../../hooks/useGadgetAnimations';
 import { useProgressControl } from '../../hooks/useProgressControl';
 import { useSocket } from '../../hooks/useSocket';
 import { GadgetProvider } from '../../providers';
+import { GadgetContentType } from '../../providers/GadgetInstanceContext';
 import { useBroadcastMutation, useDispatchSimulateMutation } from '../../queries/dispatcher';
 import { GadgetActions } from './GadgetActions';
 import { GadgetContentSlider } from './GadgetContentSlider';
@@ -29,7 +30,7 @@ export const Gadget: React.FC<GadgetProps> = ({ id, client, organization, isGrou
   } = useGadgetActions(id);
   const { removeGadgetAnimated } = useGadgetAnimations();
   const [socketOn, setSocketOn] = useState<boolean>(false);
-  const [contentToggled, setContentToggled] = useState<boolean>(true);
+  const [activeContent, setActiveContent] = useState<GadgetContentType>('progress');
   const [notifications, setNotifications] = useState<GatewayNotification[]>([]);
   const {
     register,
@@ -68,8 +69,12 @@ export const Gadget: React.FC<GadgetProps> = ({ id, client, organization, isGrou
     socket?.[action]();
   };
 
-  const handleContentToggle = () => {
-    setContentToggled((previous) => !previous);
+  const handleShowProgress = () => {
+    setActiveContent('progress');
+  };
+
+  const handleShowNotifications = () => {
+    setActiveContent('notifications');
   };
 
   // Socket notification handler
@@ -173,14 +178,15 @@ export const Gadget: React.FC<GadgetProps> = ({ id, client, organization, isGrou
       value={{
         socketOn,
         isGroup,
-        contentToggled,
+        activeContent,
         dispatchEnabled,
         client,
         organization,
         progressControls,
         notifications,
         handleToggleSocket,
-        handleContentToggle,
+        handleShowProgress,
+        handleShowNotifications,
         handleSimulateDispatch,
         handleClearNotifications,
         handleGroupBroadcast,

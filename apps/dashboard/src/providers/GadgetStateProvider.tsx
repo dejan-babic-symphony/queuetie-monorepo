@@ -7,11 +7,12 @@ import { GadgetStateContext } from './GadgetStateContext';
 const useGadgets = () => {
   const [gadgets, setGadgets] = useState<GadgetProps[]>([]);
 
-  const hasGadgets = gadgets.length > 0;
+  const hasGadgets = (gadgets || []).length > 0;
 
   const updateGadget = useCallback((targetId: string, update: Partial<GadgetProps>) => {
     setGadgets((previousGadgets) => {
-      return previousGadgets.map((gadget) => {
+      const safeGadgets = previousGadgets || [];
+      return safeGadgets.map((gadget) => {
         if (gadget.id === targetId) {
           return { ...gadget, ...update };
         }
@@ -22,8 +23,9 @@ const useGadgets = () => {
 
   const addGadget = useCallback(() => {
     setGadgets((previousGadgets) => {
+      const safeGadgets = previousGadgets || [];
       const newGadget: GadgetProps = createGadget();
-      return [...previousGadgets, newGadget];
+      return [...safeGadgets, newGadget];
     });
   }, []);
 
@@ -34,18 +36,20 @@ const useGadgets = () => {
   // Separate action functions
   const removeGadget = useCallback((id: string) => {
     setGadgets((currentGadgets) => {
-      const gadgetToRemove = currentGadgets.find((g) => g.id === id);
-      if (!gadgetToRemove) return currentGadgets;
+      const safeGadgets = currentGadgets || [];
+      const gadgetToRemove = safeGadgets.find((g) => g.id === id);
+      if (!gadgetToRemove) return safeGadgets;
 
-      const filteredGadgets = currentGadgets.filter((gadget) => gadget.id !== id);
+      const filteredGadgets = safeGadgets.filter((gadget) => gadget.id !== id);
       return autoUngroupIfNeeded(filteredGadgets, gadgetToRemove.organization.id);
     });
   }, []);
 
   const groupGadget = useCallback((id: string) => {
     setGadgets((previousGadgets) => {
-      const gadgetToGroup = previousGadgets.find((g) => g.id === id);
-      if (!gadgetToGroup) return previousGadgets;
+      const safeGadgets = previousGadgets || [];
+      const gadgetToGroup = safeGadgets.find((g) => g.id === id);
+      if (!gadgetToGroup) return safeGadgets;
 
       const newGadget: GadgetProps = createGadget({
         organization: gadgetToGroup.organization,
@@ -54,9 +58,7 @@ const useGadgets = () => {
 
       // Update the original gadget and add the new one in a single state update
       return [
-        ...previousGadgets.map((gadget) =>
-          gadget.id === id ? { ...gadget, isGroup: true } : gadget
-        ),
+        ...safeGadgets.map((gadget) => (gadget.id === id ? { ...gadget, isGroup: true } : gadget)),
         newGadget,
       ];
     });
@@ -64,13 +66,14 @@ const useGadgets = () => {
 
   const leaveGroup = useCallback((id: string) => {
     setGadgets((currentGadgets) => {
-      const gadgetToUpdate = currentGadgets.find((g) => g.id === id);
-      if (!gadgetToUpdate) return currentGadgets;
+      const safeGadgets = currentGadgets || [];
+      const gadgetToUpdate = safeGadgets.find((g) => g.id === id);
+      if (!gadgetToUpdate) return safeGadgets;
 
       const originalOrgId = gadgetToUpdate.organization.id;
       const { organization: newOrganization } = createGadget();
 
-      const updatedGadgets = currentGadgets.map((gadget) => {
+      const updatedGadgets = safeGadgets.map((gadget) => {
         if (gadget.id === id) {
           return { ...gadget, organization: newOrganization, isGroup: false };
         }
@@ -82,7 +85,7 @@ const useGadgets = () => {
   }, []);
 
   return {
-    gadgets,
+    gadgets: gadgets || [],
     hasGadgets,
     addGadget,
     clearGadgets,
