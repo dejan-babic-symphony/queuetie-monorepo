@@ -160,7 +160,7 @@ export function useProgressControl(): ProgressControlApi {
   }, []);
 
   const available = useMemo(() => {
-    return Object.values(controls)
+    return Object.values(controls || {})
       .filter((control) => control.status === ProgressStatus.Idle)
       .map((control) => control.id) as readonly string[];
   }, [controls]);
